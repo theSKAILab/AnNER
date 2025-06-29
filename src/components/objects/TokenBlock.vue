@@ -3,7 +3,10 @@
     <Token v-for="t in token.tokens" :key="t.start" :token="t" />
     <span class="tag">
       <!-- Toggle status cycle button -->
-      <i v-if="this.currentPage === 'review'" :class="this.states[this.currentState].icon" @click="cycleCurrentStatus"></i>
+      <i v-if="this.currentPage === 'review'" :class="this.states[this.currentState].icon" @click="cycleCurrentStatus"
+        :title="[this.currentState + ' - Click to cycle status']"
+        style="cursor: pointer; color: grey-9;"
+      ></i>
       {{ this.labelClass.name }}
       <!-- Replace label button (double arrows) -->
       <q-btn icon="fa fa-exchange-alt" round flat size="xs" text-color="grey-7"
