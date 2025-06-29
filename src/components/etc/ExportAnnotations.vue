@@ -17,7 +17,7 @@ export default {
           prompt: {
             model: '',
             type: 'text', // optional
-            isValid: val => val.length > 2,
+            isValid: val => val.length > 0,
           },
           cancel: true,
           persistent: true
