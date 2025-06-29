@@ -46,7 +46,7 @@ export default {
   data() {
     return {
       states: {
-        "Candidate": {numeric: 0, icon: "fas fa-ellipsis-h fa-lg"},
+        "Candidate": {numeric: 0, icon: "fas fa-question fa-lg"},
         "Accepted": {numeric: 1, icon: "fas fa-thumbs-up fa-lg"},
         "Rejected": {numeric: 2, icon: "fas fa-thumbs-down fa-lg"},
         "Suggested": {numeric: 3, icon: "fas fa-pen fa-lg"}
