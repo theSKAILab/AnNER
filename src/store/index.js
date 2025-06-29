@@ -56,12 +56,12 @@ const mutations = {
         var entity = file.annotations[i][1].entities[j];
         if (entity.length >= 3) {
             
-            const thisAnnotationHistory = entity[2]
+            const thisAnnotationHistory = entity[3]
             const latestEntry = thisAnnotationHistory[thisAnnotationHistory.length - 1];
 
             const historyEntry = {
-              start: entity[0],
-              end: entity[1],
+              start: entity[1],
+              end: entity[2],
               history: thisAnnotationHistory,
               currentState: latestEntry[0],
               name: latestEntry[2],

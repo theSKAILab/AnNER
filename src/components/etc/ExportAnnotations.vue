@@ -59,10 +59,10 @@ export default {
               }
 
               return [
+                null, // id field required for knowledge graph, initially null
                 entity.start, // start position
                 entity.end, // end position
                 history.map(h => [h[0], h[1], h[2], h[3]]), // history array
-                null, // id field required for knowledge graph, initially null
               ];
             }): []
           }
