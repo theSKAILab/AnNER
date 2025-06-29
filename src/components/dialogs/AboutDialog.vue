@@ -7,7 +7,7 @@
           <p><strong>Version: </strong>{{ version }}</p>
           <p>
             <strong>Source: </strong>
-            Adapted from <a href="https://github.com/tecoholic/ner-annotator" target="_blank">NER Annotator</a> into <a href="https://github.com/theSKAILab/TeAM-NER" target="_blank">TART Tool</a>
+            Adapted from <a href="https://github.com/tecoholic/ner-annotator" target="_blank">NER Annotator</a> into <a href="https://github.com/theSKAILab/TART" target="_blank">TART Tool</a>
           </p>
           <p>
             <strong>Author:</strong><br/>

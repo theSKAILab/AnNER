@@ -80,7 +80,7 @@
             <span class="q-menu-open-button">Help</span>
             <q-menu transition-show="jump-down" transition-hide="jump-up">
               <q-list dense style="min-width: 100px">
-                <q-item clickable v-close-popup href="https://github.com/theSKAILab/TeAM-NER/issues" target="_blank">
+                <q-item clickable v-close-popup href="https://github.com/theSKAILab/TART/issues" target="_blank">
                   Report Issue
                 </q-item>
                 <q-item clickable v-close-popup @click="showAbout = true">
