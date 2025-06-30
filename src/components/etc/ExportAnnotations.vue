@@ -45,15 +45,21 @@ export default {
                 annotator,
                 entity.labelClass.name, // The class or label from the entity
               ];
-              if (entity.reviewed && history[history.length-1][2] != annotator && history[history.length-1][0] == entity.currentState) 
+              if (entity.reviewed && history[history.length-1][2] != annotator && history[history.length-1][0] == entity.currentState && history[history.length-1][3] == entity.labelClass.name) 
               {
-                history.push([history[history.length-1][0],this.formatDate(new Date()),annotator,history[history.length-1][3]]) //  Current reviewer "concurs" with previous reviewer and is not the same as previous reviewer
+                history.push(
+                  [
+                    history[history.length-1][0],
+                    this.formatDate(new Date()),
+                    annotator,
+                    history[history.length-1][3]]
+                ) //  Current reviewer "concurs" with previous reviewer and is not the same as previous reviewer
               }
               else if ((entity.currentState == "Candidate" || entity.currentState == "Suggested") && history.length == 0) 
               {
                 history.push(newHistoryEntry); // New annotation in Annotate or Review mode
               }
-              else if (history[history.length-1][0] != entity.currentState) 
+              else if (history[history.length-1][0] != entity.currentState || history[history.length-1][3] != entity.labelClass.name) 
               {
                 history.push(newHistoryEntry); // Status change from previous entry in history
               }
