@@ -94,6 +94,7 @@ export default {
       this.tokenizeCurrentSentence()
     }
     document.addEventListener("mouseup", this.selectTokens);
+    window.onbeforeunload = this.beforeLeave;
 
     // Emits
     this.emitter.on('undo', this.undo);
