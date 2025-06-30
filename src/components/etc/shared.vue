@@ -108,8 +108,17 @@ export default {
       // Determine if the selection will overlap with an existing block and add to undo stack accordingly
       var existingBlocks = this.tm.isOverlapping(start, end);
       if (existingBlocks) {
-        this.addUndoOverlapping({"oldBlocks": existingBlocks, "newBlockStart": start});
-        this.tm.addNewBlock(start, end, this.currentClass, "Suggested", this.currentPage);
+        // Prompt to user to confirm overlapping blocks
+        this.$q.dialog({
+          title: 'Overlapping Annotations',
+          message: 'Your selection overlaps with existing annotations. Continuing will apply your current selection to the existing block. Do you want to proceed?',
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          this.addUndoOverlapping({"oldBlocks": existingBlocks, "newBlockStart": start});
+          this.tm.addNewBlock(start, end, this.currentClass, "Suggested", this.currentPage);
+        })
+        
       } else {
         this.tm.addNewBlock(start, end, this.currentClass, this.currentPage == "annotate"? "Candidate": "Suggested", this.currentPage);
         if (this.tm.getBlockByStart(start)) this.addUndoCreate(this.tm.getBlockByStart(start));
