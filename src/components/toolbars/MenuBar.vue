@@ -138,7 +138,6 @@ export default {
     };
   },
   created() {
-    console.log(this.$store.state.fileName)
     document.addEventListener('keydown', this.menuKeyBind);
     window.addEventListener("beforeinstallprompt", (e) => {
       this.installablePWA = true;
@@ -184,6 +183,7 @@ export default {
       if (e.key == "m" && e.ctrlKey && isValid) {this.$store.state.currentPage == 'annotate'? this.setCurrentPage('review'): this.setCurrentPage('annotate')}
     },
     reloadWindow() {
+      window.onbeforeunload = null; // Disable the beforeunload event
       window.location.reload();
     }
   },

@@ -136,6 +136,9 @@ export default {
         text: this.currentSentence.text,
         entities: this.tm.exportAsAnnotation(),
       });
+    },
+    beforeLeave() {
+      return "Leaving this page will discard any unsaved changes.";
     }
   },
 }
