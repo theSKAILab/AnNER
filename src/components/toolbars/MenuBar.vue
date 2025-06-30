@@ -33,7 +33,7 @@
             </q-menu>
           </div>
           
-          <input @change="(e) => {onFileSelected(e)}" type="file" ref="file" accept=".txt,.json" id="fileupload" style="display: none"/>
+          <input @change="(e) => {this.loadFile(e.target.files[0])}" type="file" ref="file" accept=".txt,.json" id="fileupload" style="display: none"/>
           
           <!-- Edit -->
           <div class="q-ml-md cursor-pointer non-selectable">
@@ -95,7 +95,7 @@
 
         <!-- Program / Mode -->
         <span class="col" style="text-align: center;" v-if="this.$store.state.currentPage != 'start'">
-          <span>{{ this.$store.fileName? this.$store.fileName + " - ": this.$store.currentPage }} </span>
+          <span>{{ titleBar }} </span>
           <span style="font-weight: bold;">{{ this.$store.state.currentPage.charAt(0).toUpperCase() + this.$store.state.currentPage.slice(1) }} Mode</span>
         </span>
 
@@ -138,6 +138,7 @@ export default {
     };
   },
   created() {
+    console.log(this.$store.state.fileName)
     document.addEventListener('keydown', this.menuKeyBind);
     window.addEventListener("beforeinstallprompt", (e) => {
       this.installablePWA = true;
@@ -150,53 +151,14 @@ export default {
     })
   },
   computed: {
-    ...mapState(["annotations", "classes","fileName","lastSavedTimestamp","currentPage"]),
+    ...mapState(["annotations", "classes","fileName","currentPage"]),
+    titleBar() {
+      return this.$store.state.fileName ? this.$store.state.fileName + " - " : "";
+    }
   },
   mixins: [ExportAnnotations],
   methods: {
     ...mapMutations(["setInputSentences", "clearAllAnnotations", "resetIndex", "setCurrentPage","loadFile"]),
-    onFileSelected(file) {
-      // onFileSelected() is called if the user clicks and manually
-      //    selects a file. If they drag and drop, that is handled in
-      //    App.vue. If you modify this function, you may also want to
-      //    modify App#onDrop(), App#processFileDrop(), and
-      //    LoadTextFile#onFileSelected() to match
-      file = file.target.files[0];
-      this.$store.fileName = file.name;
-      let fileType = file.name.split('.').pop();
-      this.$store.lastSavedTimestamp = null;
-      try {
-        let reader = new FileReader();
-        reader.readAsText(file);
-        reader.addEventListener("load", (event) => {
-          this.clearAllAnnotations();
-          this.loadFile(event.target.result);
-
-          if (fileType === "txt") {
-            this.$emit("text-file-loaded");
-          }
-          else if (fileType === "json") {
-            this.$emit("json-file-loaded");
-          }
-          else {
-            this.$q.dialog({
-              title: 'Incompatible File Type',
-              message: 'Please upload either a .txt or a .json file.'
-            })
-            this.setCurrentPage('start')
-          }
-        });
-      } catch (e) {
-        this.$q.notify({
-          icon: "fas fa-exclamation-circle",
-          message: "Invalid file",
-          color: "red-6",
-          position: "top",
-          timeout: 2000,
-          actions: [{label: "Dismiss", color: "white"}],
-        });
-      }
-    },
     toggleDarkMode: function () {
       this.$q.dark.toggle();
     },

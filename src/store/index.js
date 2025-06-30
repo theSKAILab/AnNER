@@ -18,16 +18,16 @@ const mutations = {
     state.currentClass = state.classes[0];
     LocalStorage.set("tags", state.classes);
   },
-  loadFile(state, payload) {
+  processFile(state, payload) {
     // Clear Out Data
     state.annotations = [];
     state.currentAnnotation = {};
     state.classes = [];
     state.currentClass = null;
-    this.undoStack = [];
+    state.undoStack = [];
 
     var file = payload;
-    if (this.fileName.split(".")[1] == "json") {
+    if (state.fileName.split(".")[1] == "json") {
       file = JSON.parse(file);
     } else {
       // This forces the text file into the annotation file format, thus allowing it to be loaded the same without special edge cases
@@ -186,6 +186,46 @@ const mutations = {
     }
     state.undoStack.push(newUndo);
     state.undoStack.sort((a, b) => b.timestamp - a.timestamp);
+  },
+  loadFile(state, file) {
+    // onFileSelected() is called if the user clicks and manually
+    //    selects a file. If they drag and drop, that is handled in
+    //    App.vue. If you modify this function, you may also want to
+    //    modify App#onDrop(), App#processFileDrop(), and
+    //    LoadTextFile#onFileSelected() to match
+    state.fileName = file.name;
+    let fileType = file.name.split('.').pop();
+    state.lastSavedTimestamp = null;
+    try {
+      let reader = new FileReader();
+      reader.readAsText(file);
+      reader.addEventListener("load", (event) => {
+        mutations.processFile(state, event.target.result);
+
+        if (fileType === "txt") {
+          mutations.setCurrentPage(state, 'annotate');
+        }
+        else if (fileType === "json") {
+          mutations.setCurrentPage(state, 'review');
+        }
+        else {
+          this.$q.dialog({
+            title: 'Incompatible File Type',
+            message: 'Please upload either a .txt or a .json file.'
+          })
+          mutations.setCurrentPage(state, 'start')
+        }
+      });
+    } catch (e) {
+      this.$q.notify({
+        icon: "fas fa-exclamation-circle",
+        message: "Invalid file",
+        color: "red-6",
+        position: "top",
+        timeout: 2000,
+        actions: [{label: "Dismiss", color: "white"}],
+      });
+    }
   }
 };
 
@@ -220,7 +260,7 @@ export default {
       currentIndex: 0,
       currentPage: "start",
       currentSentence: "",
-      fileName: "",
+      fileName: null,
       inputSentences: [],
       lastSavedTimestamp: null,
       originalText: "",
