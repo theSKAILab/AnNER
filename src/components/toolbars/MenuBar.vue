@@ -157,7 +157,7 @@ export default {
   },
   mixins: [ExportAnnotations],
   methods: {
-    ...mapMutations(["setInputSentences", "clearAllAnnotations", "resetIndex", "setCurrentPage","loadFile"]),
+    ...mapMutations(["setCurrentPage","loadFile"]),
     toggleDarkMode: function () {
       this.$q.dark.toggle();
     },
