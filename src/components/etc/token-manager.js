@@ -138,7 +138,6 @@ class TokenManager {
           end: tokens[tokens.length - 1].end,
           tokens: tokens,
           labelClass: _class,
-          classId: _class.id || 0,
           currentState: currentState,
           reviewed: false,
           history: history
