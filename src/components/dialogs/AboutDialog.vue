@@ -3,11 +3,11 @@
     <q-card style="min-width: 50%;" flat bordered>
       <q-card-section horizontal>
         <q-card-section style="min-width: 50%;">
-          <div class="text-h6">TART Tool</div>
+          <div class="text-h6" style="margin-bottom: 10px;">Annotation and Named Entity Review Tool (AnNER)</div>
           <p><strong>Version: </strong>{{ version }}</p>
           <p>
             <strong>Source: </strong>
-            Adapted from <a href="https://github.com/tecoholic/ner-annotator" target="_blank">NER Annotator</a> into <a href="https://github.com/theSKAILab/TART" target="_blank">TART Tool</a>
+            Adapted from <a href="https://github.com/tecoholic/ner-annotator" target="_blank">NER Annotator</a> into <a href="https://github.com/theSKAILab/AnNER" target="_blank">AnNER</a>
           </p>
           <p>
             <strong>Author:</strong><br/>

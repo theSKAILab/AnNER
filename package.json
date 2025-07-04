@@ -1,6 +1,6 @@
 {
-  "name": "TART",
-  "version": "1.4.6",
+  "name": "AnNER",
+  "version": "1.4.61",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

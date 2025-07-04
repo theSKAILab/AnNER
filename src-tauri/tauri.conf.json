@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "TART",
+  "productName": "AnNER",
   "version": "0.1.0",
-  "identifier": "com.skai.tart",
+  "identifier": "com.skai.AnNER",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:8080",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Text Annotation Review and Tagging (TART)",
+        "title": "Annotation and Named Entity Review Tool (AnNER)",
         "width": 800,
         "height": 600,
         "resizable": true,

@@ -1,7 +1,7 @@
 const webpack = require("webpack");
 
 module.exports = {
-  publicPath: "/TART/",
+  publicPath: "/AnNER/",
   // publicPath: process.env.NODE_ENV === "production" ? "/TeAM-NER/" : "/",
 
   pluginOptions: {
@@ -12,7 +12,7 @@ module.exports = {
   },
 
   pwa: {
-      name: "Text Annotation Review and Tagging",
+      name: "AnNER: Annotation and Named Entity Review Tool",
       themeColor: '#002a5c',
       msTileColor: '#002a5c',
       workboxOptions: {
