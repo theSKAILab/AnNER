@@ -20,8 +20,11 @@
 
         <q-card-section>
           This research was supported in part by the
-          U.S. Department of Agriculture through a National Institute of Food and Agriculture (NIFA) grant, Award #<a href="https://portal.nifa.usda.gov/web/crisprojectpages/1025810-cellulose-materials-informatics-building-a-knowledge-graph-for-cellulose-materials-discovery-and-research-cellograph.html" target="_blank">2021-67022-34366</a>
-          <br/><br/><img src="@/assets/forestserviceicon.png" style="width: 100%;"/>
+          U.S. Department of Agriculture through a National Institute of Food and Agriculture (NIFA) grant, Award #<a href="https://portal.nifa.usda.gov/web/crisprojectpages/1025810-cellulose-materials-informatics-building-a-knowledge-graph-for-cellulose-materials-discovery-and-research-cellograph.html" target="_blank">2021-67022-34366</a><br/>
+          <br/>This tool was designed and developed in the Spatial Knowledge and Artificial Intelligence (SKAI) lab at University of Maine<br/><br/>
+          <span style="font-weight: bold;">Cite this tool as:</span><br />
+          Author 1, Author 2, Author 3, & Author 4. ({{ new Date().getFullYear() }}). 
+          <span style="font-style: italic;">Annotation and Named Entity Review Tool (AnNER)</span> [Computer software].
         </q-card-section>
       </q-card-section>
       <q-card-actions align="right">
