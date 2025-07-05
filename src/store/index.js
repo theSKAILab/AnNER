@@ -29,6 +29,13 @@ const mutations = {
     var file = payload;
     if (state.fileName.split(".")[1] == "json") {
       file = JSON.parse(file);
+      file.annotations = file.annotations.map((item) => {
+        return [
+          item[1],
+          item[2]
+        ]
+      })
+      // Strip paragraph ID from the file
     } else {
       // This forces the text file into the annotation file format, thus allowing it to be loaded the same without special edge cases
       file = file.replace(/(\r\n|\n|\r){2,}/gm, "\n");
@@ -63,9 +70,9 @@ const mutations = {
               start: entity[1],
               end: entity[2],
               history: thisAnnotationHistory,
-              currentState: latestEntry[0],
-              name: latestEntry[2],
-              labelClass: {name: latestEntry[3]},
+              currentState: latestEntry[1],
+              name: latestEntry[3],
+              labelClass: {name: latestEntry[0]},
             }
            
             sentenceOriginalState.push(historyEntry);

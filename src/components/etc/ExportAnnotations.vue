@@ -34,32 +34,34 @@ export default {
           color: c.color
         })),
         annotations: this.annotations.map(annotation => [
+          null, // id field for paragraph, required for knowledge graph, initially null
           annotation.text,  // Text directly in the array
           {
             entities: annotation.entities.length? annotation.entities.map(entity => {
               //annotation.start, annotation.end, _class, annotation.ogNLP, annotation.ogNLP, true, annotation.name, annotation.currentState, annotation.annotationHistory, false
               let history = entity.history;  // Ensure history is initialized
               const newHistoryEntry = [
+                entity.labelClass.name, // The class or label from the entity
                 entity.currentState, // Current status of the entity
                 this.formatDate(new Date()),
                 annotator,
-                entity.labelClass.name, // The class or label from the entity
               ];
-              if (entity.reviewed && history[history.length-1][2] != annotator && history[history.length-1][0] == entity.currentState && history[history.length-1][3] == entity.labelClass.name) 
+              if (entity.reviewed && history[history.length-1][3] != annotator && history[history.length-1][1] == entity.currentState && history[history.length-1][0] == entity.labelClass.name) 
               {
                 history.push(
                   [
                     history[history.length-1][0],
+                    history[history.length-1][1],
                     this.formatDate(new Date()),
-                    annotator,
-                    history[history.length-1][3]]
+                    annotator
+                  ]
                 ) //  Current reviewer "concurs" with previous reviewer and is not the same as previous reviewer
               }
               else if ((entity.currentState == "Candidate" || entity.currentState == "Suggested") && history.length == 0) 
               {
                 history.push(newHistoryEntry); // New annotation in Annotate or Review mode
               }
-              else if (history[history.length-1][0] != entity.currentState || history[history.length-1][3] != entity.labelClass.name) 
+              else if (history[history.length-1][1] != entity.currentState || history[history.length-1][0] != entity.labelClass.name) 
               {
                 history.push(newHistoryEntry); // Status change from previous entry in history
               }
