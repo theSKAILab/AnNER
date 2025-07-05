@@ -26,7 +26,7 @@ import ClassesBlock from "../objects/ClassesBlock.vue";
 import TokenManager from "../etc/token-manager";
 import Tokenizer from "../etc/tokenizer";
 import InfoBar from "../toolbars/InfoBar.vue";
-import SharedEditorFunctions from "../etc/shared.vue";
+import SharedEditorFunctions from "./shared.vue";
 
 export default {
   name: "ReviewPage",
