@@ -1,14 +1,13 @@
-@import "./quasar.variables.scss";
-@import "~quasar-styl";
-// @import '~quasar-addon-styl';
+@import './quasar.variables.scss';
 
 * {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+    'Helvetica Neue', sans-serif;
 }
 
 body.body--dark {
-  background: #1D1D1D;
+  background: #1d1d1d;
 }
 
 .q-btn--outline::before {
@@ -59,7 +58,7 @@ body.body--dark {
   display: inline-block;
 }
 
-.q-menu-open-button:first-letter  {
+.q-menu-open-button:first-letter {
   text-decoration: underline;
 }
 
@@ -71,8 +70,8 @@ body.body--dark {
 }
 
 .menu-file-picker {
-  font-size: 14px !important; 
-  color: rgb(0,0,0) !important;
+  font-size: 14px !important;
+  color: rgb(0, 0, 0) !important;
 }
 
 .disabled {

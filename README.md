@@ -1,80 +1,39 @@
-# NER Annotator for Spacy
+# AnNER
 
-NER Annotator for SpaCy allows you to create training data for creating a custom NER Model with custom tags.
+This template should help get you started developing with Vue 3 in Vite.
 
-- Web Application: [https://tecoholic.github.io/ner-annotator/](https://tecoholic.github.io/ner-annotator/)
-- Linux: [Debian Package or an AppImage](https://github.com/tecoholic/ner-annotator/releases)
-- Windows: [x64 MSI Installer](https://github.com/tecoholic/ner-annotator/releases)
+## Recommended IDE Setup
 
-## Screenshots
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-![NER Annotator Screenshot](./assets/tagging-2.png)
+## Type Support for `.vue` Imports in TS
 
-## Development
+TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
 
-### Requirements
+## Customize configuration
 
-1. Node JS 12.x or 14.x
-2. Yarn Package Manager
-3. Rust (for building desktop versions)
+See [Vite Configuration Reference](https://vite.dev/config/).
 
-### Running it locally for development
-
-1. Open another terminal and start the server for the UI
+## Project Setup
 
 ```sh
-yarn
-yarn serve
+pnpm install
 ```
 
-Now go to [http://localhost:8081/ner-annotator/](http://localhost:8081/ner-annotator/)
-
-### Developing the desktop application
-
-The desktop applications have been created using [Tauri](https://tauri.studio).
+### Compile and Hot-Reload for Development
 
 ```sh
-yarn tauri:serve
+pnpm dev
 ```
 
-To build the final binaries run
+### Type-Check, Compile and Minify for Production
 
 ```sh
-yarn tauri:build
+pnpm build
 ```
 
-## Credits
+### Lint with [ESLint](https://eslint.org/)
 
-1. App Icon - <a href="https://www.flaticon.com/free-icons/ornithology" title="ornithology icons">Ornithology icons created by Freepik - Flaticon</a>
-
-## Changelog
-
-#### Version 1.3.0
-- Drag and drop to upload files
-- Support for character level annotations
-- Added error messages and confirmation dialogs
-- Even more bug fixes
-
-#### Version 1.2.0
-- Import annotations.
-- Open a new file while one is already open.
-- Keyboard shortcuts
-- Lots and lots of bug fixes.
-
-#### Version 1.1.0
-
-- Adds "Back" button that allows navigating back to sentences/text blocks that's already been tagged and make changes.
-
-#### Version 1.0.0
-
-- Rewritten UI using [Quasar](https://quasar.dev) framework
-- Export and Import tags
-
-##### Version 0.1.1
-
-- [#14](../../issues/14) - Remembers tags across sessions
-- [#3](../../issues/3) - Adds a button to enable/disable removing of tags to prevent accidental removal of tags
-
-##### Version 0.1.0
-
-- Adds the desktop application
+```sh
+pnpm lint
+```
