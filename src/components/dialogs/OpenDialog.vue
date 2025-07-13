@@ -11,8 +11,8 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat label="Cancel" v-close-popup @click="$emit('hide')"/>
-        <q-btn flat label="OK" v-close-popup @click="$emit('confirm')"/>
+        <q-btn flat label="Cancel" v-close-popup @click="$emit('hide')" />
+        <q-btn flat label="OK" v-close-popup @click="$emit('confirm')" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -20,13 +20,13 @@
 
 <script>
 export default {
-  name: "OpenDialog",
-  emits: ["hide", "confirm"],
+  name: 'OpenDialog',
+  emits: ['hide', 'confirm'],
   props: {
     show: {
       type: Boolean,
       default: false,
     },
   },
-};
+}
 </script>

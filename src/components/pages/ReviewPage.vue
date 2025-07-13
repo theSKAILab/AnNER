@@ -1,15 +1,15 @@
 <template>
   <div>
-    <classes-block />
-    <div class="q-pa-lg" style="height: calc(100vh - 190px); overflow-y:scroll;">
-      <component 
-        v-for="t in eligibleTokens" 
+    <labels-block />
+    <div class="q-pa-lg" style="height: calc(100vh - 190px); overflow-y: scroll">
+      <component
+        v-for="t in eligibleTokens"
         :key="`${t.type}-${t.start}`"
-        :is="t.type === 'token' ? 'Token' : 'TokenBlock'" 
+        :is="t.type === 'token' ? 'Token' : 'TokenBlock'"
         :token="t"
         :class="[t.reviewed ? 'user-active' : 'user-inactive']"
-        :history="t.history" 
-        @remove-block="onRemoveBlock" 
+        :history="t.history"
+        @remove-block="onRemoveBlock"
         v-model:currentState="t.currentState"
         v-model:labelClass="t.labelClass"
         v-model:reviewed="t.reviewed"
@@ -19,99 +19,61 @@
   </div>
 </template>
 <script>
-import { mapState, mapMutations } from "vuex";
-import Token from "../objects/Token";
-import TokenBlock from "../objects/TokenBlock";
-import ClassesBlock from "../objects/ClassesBlock.vue";
-import TokenManager from "../etc/token-manager";
-import Tokenizer from "../etc/tokenizer";
-import InfoBar from "../toolbars/InfoBar.vue";
-import SharedEditorFunctions from "./shared.vue";
+import { mapState } from 'vuex'
+import Token from '../blocks/Token'
+import TokenBlock from '../blocks/TokenBlock'
+import LabelsBlock from '../blocks/LabelsBlock.vue'
+import InfoBar from '../toolbars/InfoBar.vue'
+import SharedEditorFunctions from './shared.vue'
 
 export default {
-  name: "ReviewPage",
-  data: function () {
-    return {
-      tm: new TokenManager([]),
-      currentSentence: {},
-      tokenizer: new Tokenizer(),
-    };
-  },
+  name: 'ReviewPage',
   components: {
     Token,
     TokenBlock,
-    ClassesBlock,
-    InfoBar
+    LabelsBlock,
+    InfoBar,
   },
   computed: {
-    ...mapState([
-      "annotations",
-      "annotationHistory",
-      "classes",
-      "currentClass",
-      "currentIndex",
-      "inputSentences",
-      "annotationPrecision",
-      "undoStack"
-    ]),
+    ...mapState(['annotations']),
     // TODO: THIS SHOULD BE REWRITTEN BETTER
     eligibleTokens() {
-      var renderedList = [];
-      for (let i = 0; i < this.tm.tokens.length; i++) {
-        let t = this.tm.tokens[i];
-        let tokenOverlapping = this.tm.isOverlapping(t.start, t.end);
+      const renderedList = []
+      for (let i = 0; i < this.tokenManager.tokens.length; i++) {
+        const t = this.tokenManager.tokens[i]
+        const tokenOverlapping = this.tokenManager.isOverlapping(t.start, t.end)
         if (!tokenOverlapping) {
-          renderedList.push(t);
-        } else if (t.currentState == 'Rejected' && tokenOverlapping != null && t == tokenOverlapping[0]) {
-          renderedList.push(t);
+          renderedList.push(t)
+        } else if (
+          t.currentState == 'Rejected' &&
+          tokenOverlapping != null &&
+          t == tokenOverlapping[0]
+        ) {
+          renderedList.push(t)
         } else if (t.currentState != 'Rejected' && tokenOverlapping != null) {
-          renderedList.push(t);
+          renderedList.push(t)
         }
       }
-      return renderedList;
-    }
-  },
-  watch: {
-    inputSentences() {
-      this.resetIndex();
-      this.tokenizeCurrentSentence();
+      return renderedList
     },
-    annotations() {
-      if (this.currentAnnotation != this.annotations[this.currentIndex]) {
-        this.tokenizeCurrentSentence();
-      }
-    },
-    classes() {
-      this.tokenizeCurrentSentence();
-    },
-    annotationPrecision() {
-      this.tokenizeCurrentSentence();
-    }
   },
   created() {
     // Add blocks for all paragraphs
-    if (this.inputSentences.length) {
+    if (this.annotationManager.inputSentences.length) {
       this.tokenizeCurrentSentence()
     }
-    document.addEventListener("mouseup", this.selectTokens);
-    window.onbeforeunload = this.beforeLeave;
+    document.addEventListener('mouseup', this.selectTokens)
+    window.onbeforeunload = this.beforeLeave
 
     // Emits
-    this.emitter.on('undo', this.undo);
-    this.emitter.on('undoAll',  this.undoAll);
-    this.emitter.on('tokenizeCurrentSentence', this.tokenizeCurrentSentence);
+    this.emitter.on('tokenizeCurrentSentence', this.tokenizeCurrentSentence)
   },
   beforeUnmount() {
-    document.removeEventListener("mouseup", this.selectTokens);
+    document.removeEventListener('mouseup', this.selectTokens)
 
     // Remove emits
-    this.emitter.off('undo', this.undo);
-    this.emitter.off('undoAll',  this.undoAll);
-    this.emitter.off('tokenizeCurrentSentence', this.tokenizeCurrentSentence);
+    this.emitter.off('tokenizeCurrentSentence', this.tokenizeCurrentSentence)
   },
   mixins: [SharedEditorFunctions],
-  methods: {
-    ...mapMutations(["resetIndex"]),
-  },
-};
+}
 </script>
