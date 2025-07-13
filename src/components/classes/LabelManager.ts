@@ -59,14 +59,14 @@ export class LabelManager {
   }
 
   public doesAlreadyExist(newLabel: string): boolean {
-    let labelExists: boolean = false;
+    let labelExists: boolean = false
     this.labels.forEach((label) => {
       if (label.name.toLowerCase() == newLabel.toLowerCase()) {
         console.log(label.name.toLowerCase(), newLabel.toLowerCase())
-        labelExists = true;
+        labelExists = true
       }
-    });
-    return labelExists;
+    })
+    return labelExists
   }
 
   public addLabel(name: string) {

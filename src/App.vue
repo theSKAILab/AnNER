@@ -5,83 +5,96 @@
     @dragenter="onDragEnter"
     @dragleave.self="onDragLeave"
     @drop.stop.prevent="onDrop"
-    style="overflow-y:scroll;"
+    style="overflow-y: scroll"
   >
-    <div :style="{'pointer-events': overlayActive ? 'none' : 'auto'}">
+    <div :style="{ 'pointer-events': overlayActive ? 'none' : 'auto' }">
       <q-layout view="hHh lpR fFf">
-        <menu-bar/>
+        <menu-bar />
         <q-page-container>
-          <start-page v-if="currentPage === 'start'"/>
+          <start-page v-if="currentPage === 'start'" />
           <annotation-page v-if="currentPage === 'annotate'" />
           <review-page v-if="currentPage === 'review'" />
         </q-page-container>
       </q-layout>
-      <drag-n-drop-overlay :style="{'visibility': overlayActive && pendingFileDrop == null ? 'visible' : 'hidden'}"/>
-      <exit-dialog :show="pendingFileDrop != null && currentPage != 'start'" @hide="pendingFileDrop = null" @confirm="processFileDrop()"/>
+      <!-- Drag/Drop Overlay -->
+      <div
+        class="fullscreen column justify-center bg-black"
+        :style="{ visibility: overlayActive && pendingFileDrop == null ? 'visible' : 'hidden' }"
+      >
+        <div class="column items-center">
+          <p class="text-h2 text-white">
+            <q-icon name="fas fa-upload" />
+          </p>
+          <p class="text-h3 text-white">Drop file to upload.</p>
+        </div>
+      </div>
+      <exit-dialog
+        :show="pendingFileDrop != null && currentPage != 'start'"
+        @hide="pendingFileDrop = null"
+        @confirm="processFileDrop()"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import MenuBar from "./components/toolbars/MenuBar.vue";
-import StartPage from "./components/pages/StartPage.vue";
-import AnnotationPage from "./components/pages/AnnotationPage.vue";
-import ReviewPage from "./components/pages/ReviewPage.vue";
-import DragNDropOverlay from "./components/etc/DragNDropOverlay.vue";
-import { mapState, mapMutations } from "vuex";
-import { useQuasar } from "quasar";
+import MenuBar from './components/toolbars/MenuBar.vue'
+import StartPage from './components/pages/StartPage.vue'
+import AnnotationPage from './components/pages/AnnotationPage.vue'
+import ReviewPage from './components/pages/ReviewPage.vue'
+import { mapState, mapMutations } from 'vuex'
+import { useQuasar } from 'quasar'
 
 export default {
-  name: "LayoutDefault",
+  name: 'LayoutDefault',
   setup() {
-    const $q = useQuasar();
+    const $q = useQuasar()
     return {
       notify(icon, message, level) {
         $q.notify({
           icon,
           message,
           color: level,
-          position: "top",
+          position: 'top',
           timeout: 2000,
           actions: [
             {
-              label: "Dismiss",
-              color: "white",
+              label: 'Dismiss',
+              color: 'white',
             },
           ],
-        });
+        })
       },
-    };
+    }
   },
   data() {
     return {
       overlayActive: false,
       pendingFileDrop: null,
-    };
+    }
   },
   components: {
     MenuBar,
     StartPage,
     AnnotationPage,
     ReviewPage,
-    DragNDropOverlay
   },
   computed: {
-    ...mapState(["annotations", "classes", "currentPage"]),
+    ...mapState(['classes', 'currentPage']),
   },
   methods: {
-    ...mapMutations(["loadClasses", "loadAnnotations", "setInputSentences", "clearAllAnnotations", "resetIndex", "setCurrentPage", "loadFile"]),
+    ...mapMutations(['setCurrentPage', 'loadFile']),
     onDragEnter() {
-      if (this.currentPage == "start") this.overlayActive = true;
+      if (this.currentPage == 'start') this.overlayActive = true
     },
     onDragLeave() {
-      if (this.currentPage == "start") this.overlayActive = false;
+      if (this.currentPage == 'start') this.overlayActive = false
     },
     onDrop(event) {
-      this.overlayActive = false;
+      this.overlayActive = false
       this.pendingFileDrop = event.dataTransfer.files[0]
-      if (this.currentPage == "start")  this.loadFile(this.pendingFileDrop);
+      if (this.currentPage == 'start') this.loadFile(this.pendingFileDrop)
     },
   },
-};
+}
 </script>

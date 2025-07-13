@@ -15,14 +15,16 @@ import '@quasar/extras/fontawesome-v5/fontawesome-v5.css'
 import '@quasar/extras/ionicons-v4/ionicons-v4.css'
 import { Notify, Dialog } from 'quasar'
 
-const app = createApp(App).use(Quasar, {
-  config: {},
-  plugins: {
-    Notify,
-    Dialog,
-  },
-  iconSet: iconSet,
-}).use(createStore(store))
+const app = createApp(App)
+  .use(Quasar, {
+    config: {},
+    plugins: {
+      Notify,
+      Dialog,
+    },
+    iconSet: iconSet,
+  })
+  .use(createStore(store))
 
 app.config.globalProperties.emitter = mitt()
 
