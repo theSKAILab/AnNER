@@ -54,16 +54,16 @@ export default {
      * Adds a new block to the TokenManager based on the current selection
      */
     selectTokens() {
-      const selection = document.getSelection()
+      const selection: Selection | null = document.getSelection()
       if (
-        selection.anchorOffset === selection.focusOffset &&
-        selection.anchorNode === selection.focusNode
+        selection?.anchorOffset === selection?.focusOffset &&
+        selection?.anchorNode === selection?.focusNode
       ) {
         return
       }
 
-      const rangeStart = selection.getRangeAt(0)
-      const rangeEnd = selection.getRangeAt(selection.rangeCount - 1)
+      const rangeStart = selection?.getRangeAt(0)
+      const rangeEnd = selection?.getRangeAt(selection?.rangeCount - 1)
 
       let start, end
       try {
@@ -75,12 +75,12 @@ export default {
       }
 
       // No classes available to tag
-      if (!this.labelManager.lastId && selection.anchorNode) {
+      if (!this.labelManager.lastId && selection?.anchorNode) {
         this.$q.dialog({
           title: 'No Tags Available',
           message: 'Please add some Tags before tagging.',
         })
-        selection.empty()
+        selection?.empty()
         return
       }
 
@@ -105,8 +105,7 @@ export default {
               end,
               this.labelManager.currentLabel,
               'Suggested',
-              [],
-              this.currentPage,
+              []
             )
           })
       } else {
@@ -115,13 +114,12 @@ export default {
           end,
           this.labelManager.currentLabel,
           this.currentPage == 'annotate' ? 'Candidate' : 'Suggested',
-          [],
-          this.currentPage,
+          []
         )
         if (this.tokenManager.getBlockByStart(start)) this.undoManager.addCreateUndo(start)
       }
 
-      selection.empty()
+      selection?.empty()
       this.save()
     },
     // Callbacks for Token and TokenBlock components
