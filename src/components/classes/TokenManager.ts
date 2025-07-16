@@ -2,8 +2,8 @@ import { Entity, History, Paragraph } from './AnnotationManager'
 import { Label, LabelManager } from './LabelManager'
 
 export interface TMTokens {
-  start: number | undefined
-  end: number | undefined
+  start: number
+  end: number
   currentState: string | undefined
   previousState?: string | undefined // Optional field for previous state in review mode
 }
@@ -95,87 +95,78 @@ export class TokenManager {
     }
   }
 
+  public blocksInRange(start: number, end: number): TMTokens[] {
+    const blocks: TMTokens[] = []
+    for (let i = 0; i < this.tokens.length; i++) {
+      const token: TMTokens = this.tokens[i]
+      if (
+        (token.start >= start && token.start <= end) ||
+        (token.end >= start && token.end <= end) ||
+        (token.start <= start && token.end >= end)
+      ) {
+        blocks.push(token)
+      }
+    }
+    return blocks
+  }
+
   public addNewBlock(
     start: number,
     end: number,
     labelClass: Label | undefined,
     currentState: string,
-    history: History[] = [],
-    runMode: string = 'annotate',
+    history: History[] = []
   ): void {
-    const selectionStart: number = end < start ? end : start
-    const selectionEnd: number = end > start ? end : start
-    let overlappedBlock: TMTokens | null = null
+    let selectionStart: number = end < start ? end : start
+    let selectionEnd: number = end > start ? end : start
+    
+    const overlappedBlocks: TMTokens[] | null = this.isOverlapping(selectionStart, selectionEnd)
+    
+    // If there are any overlapping TMTokenBlocks, we need to handle that edge case
+    // This will use the properties of the first returned block
+    // to overwrite the properties of the new block
+    if (overlappedBlocks) {
+      overlappedBlocks.sort((a, b) => a.start - b.start)
+      history = overlappedBlocks[0].history;
+      
+      for (const block of overlappedBlocks) {
+        this.removeBlock(block.start, true) // Remove the block and reintroduce tokens (we will grab them later)
+      }
 
-    let selectedTokens: TMToken[] = []
-    const newTokens: TMTokens[] = []
-
-    for (let i: number = 0; i < this.tokens.length; i++) {
-      const currentToken: TMTokens = this.tokens[i]
-      if (currentToken.start >= selectionEnd && selectedTokens.length) {
-        // We are outside of the selection, add the new block here
-        newTokens.push(
-          new TMTokenBlock(
-            selectedTokens[0].start,
-            selectedTokens[selectedTokens.length - 1].end,
-            selectedTokens,
-            labelClass,
-            currentState,
-            false, // reviewed
-            history,
-          ),
-        )
-        selectedTokens = []
-        newTokens.push(currentToken)
-      } else if (currentToken.start >= selectionStart && currentToken.end <= selectionEnd) {
-        // Overlapping Selection
-        // Token is inside the selection
-        if (currentToken.type === 'token-block') {
-          if (runMode == 'review') {
-            currentToken.previousState = currentToken.currentState
-            currentToken.currentState = currentState
-            overlappedBlock = { ...currentToken }
-            // Remove existing block
-            this.removeBlock(currentToken.start)
-            // Backup
-            i--
-          } else {
-            this.removeBlock(currentToken.start) // Remove existing block
-            i--
-          }
-        } else if (currentToken.type === 'token') {
-          selectedTokens.push(currentToken)
-        }
-      } else {
-        newTokens.push(currentToken)
+      // We now need to adjust the selection start and end
+      // to the first and last blocks in the overlapping blocks
+      if (overlappedBlocks[0].start < selectionStart) {
+        selectionStart = overlappedBlocks[0].start
+      }
+      if (overlappedBlocks[overlappedBlocks.length - 1].end > selectionEnd) {
+        selectionEnd = overlappedBlocks[overlappedBlocks.length - 1].end
       }
     }
+    
+    const targetedBlocks: TMTokens[] = this.blocksInRange(selectionStart, selectionEnd);
 
-    if (selectedTokens.length) {
-      newTokens.push(
-        new TMTokenBlock(
-          selectedTokens[0].start,
-          selectedTokens[selectedTokens.length - 1].end,
-          selectedTokens,
-          labelClass,
-          currentState,
-          false, // reviewed
-          history,
-        ),
+    // Remove old blocks in prep for new blocks
+    for (let i = 0; i < targetedBlocks.length; i++) {
+      this.tokens = this.tokens.filter((token: TMTokens) => {
+        return (token.start != targetedBlocks[i].start)
+      })
+    }
+
+    // Go ahead and insert the new block now
+    // If we overlapped, the overwrites of the blocks params will be passed in
+    this.tokens.push(
+      new TMTokenBlock(
+        selectionStart,
+        selectionEnd,
+        targetedBlocks as TMToken[],
+        labelClass as Label,
+        currentState,
+        false, // reviewed
+        history,
       )
-      selectedTokens = [] // Ensure selected tokens are cleared after use
-    }
+    )
 
-    // If there is an overlapped block and we are in review mode, add it back to the new tokens array
-    if (overlappedBlock && runMode === 'review') {
-      // Add the overlapped block back to the new tokens array
-      newTokens.push(overlappedBlock)
-    }
-
-    // Update the tokens array with new tokens
-    newTokens.sort((a, b) => a.start - b.start)
-    this.tokens = newTokens
-    this.edited++
+    this.tokens.sort((a, b) => a.start - b.start)
   }
 
   public addBlockFromStructure(entity: Entity | TMTokenBlock): void {
@@ -184,26 +175,28 @@ export class TokenManager {
       entity.end,
       entity.labelClass,
       entity.currentState || 'Candidate',
-      entity.history || [],
-      'annotate', // Default run mode
+      entity.history || []
     )
     this.edited++
   }
 
   public removeBlock(start: number, reintroduceTokens: boolean = true): void {
-    const newTokens: TMTokens[] = []
-    for (let i = 0; i < this.tokens.length; i++) {
-      // If there is a token block that is targeted for removal
-      // Remove it and add the tokens back to the array
-      // Note: Skip this step for instances like when undoing an overlapping block action
-      if (this.tokens[i] instanceof TMTokenBlock && this.tokens[i].start == start) {
-        if (reintroduceTokens) newTokens.push(...this.tokens[i].tokens)
-      } else {
-        newTokens.push(this.tokens[i])
+
+    const targetBlock: TMTokens|null = this.getBlockByStart(start);
+
+    // Verify that the block exists before proceeding
+    if (targetBlock) {
+      this.tokens = this.tokens.filter((token: TMTokens) => {
+        return (token.start != start)
+      })
+
+      if (reintroduceTokens && (targetBlock instanceof TMTokenBlock)) {
+        this.tokens.push(...targetBlock?.tokens);
       }
+
+      this.edited++
+      this.tokens.sort((a, b) => a.start - b.start);
     }
-    this.tokens = newTokens
-    this.edited++
   }
 
   public removeDuplicateBlocks(): void {
