@@ -62,7 +62,6 @@ export class LabelManager {
     let labelExists: boolean = false
     this.labels.forEach((label) => {
       if (label.name.toLowerCase() == newLabel.toLowerCase()) {
-        console.log(label.name.toLowerCase(), newLabel.toLowerCase())
         labelExists = true
       }
     })

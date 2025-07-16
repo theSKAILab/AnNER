@@ -117,7 +117,6 @@ export default {
       if (!this.labelManager.doesAlreadyExist(this.newClassName)) {
         this.labelManager.addLabel(this.newClassName)
       } else {
-        console.log('Label exists')
         this.$q.notify({
           type: 'negative',
           message: 'Label already exists!',

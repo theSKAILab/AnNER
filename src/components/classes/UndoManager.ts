@@ -14,11 +14,9 @@ export class UndoManager {
   }
 
   public undo(tokenManager: TokenManager): void {
-    console.log('Undoing last action')
     if (this.undoStack.length) {
       const latestAction: UndoAction = this.undoStack.pop()
       latestAction.callback(tokenManager)
-      console.log(tokenManager)
     }
   }
 
@@ -72,7 +70,6 @@ class UndoAction {
   }
 
   public callback(tokenManager: TokenManager): void {
-    console.log(this, tokenManager)
     switch (this.type) {
       case UndoAction.CreateAction:
         tokenManager.addBlockFromStructure(this.block as TMTokenBlock)
@@ -86,11 +83,15 @@ class UndoAction {
         tokenManager.removeBlock(this.start as number)
         break
       case UndoAction.OverlappingAction:
+        let earliestStart: number | null = null;
         const overlappingBlocks: TMTokenBlock[] = this.block as TMTokenBlock[]
-        for (let i = 0; i < overlappingBlocks.length; i++) {
-          tokenManager.removeBlock(overlappingBlocks[i].start, false)
+
+        if (this.start < overlappingBlocks[0].start) {
+          earliestStart = this.start
+        } else {
+          earliestStart = overlappingBlocks[0].start
         }
-        tokenManager.removeBlock(this.overlappingStart as number, true)
+        tokenManager.removeBlock(earliestStart, true)
         // Add the old blocks back
         for (let i = 0; i < overlappingBlocks.length; i++) {
           tokenManager.addBlockFromStructure(overlappingBlocks[i]) // DEPARTURE FROM PREVIOUS
