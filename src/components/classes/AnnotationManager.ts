@@ -152,6 +152,7 @@ export class Entity {
     history: object[] | History[] = [],
     labelClass: Label | undefined = undefined,
     reviewed: boolean = false, // Indicates if the entity has been reviewed
+    currentState?: string, // Default state of the entity
   ) {
     this.start = start // Start index of the entity
     this.end = end // End index of the entity
@@ -168,6 +169,12 @@ export class Entity {
       this.labelName = labelClass.name // Set the label name from the label class
     }
     this.setFromLastHistoryEntry() // Set the current state, name, and label class from the last history entry
+    
+    // Not sure why I have to do it this way, but it works for now
+    // TODO improve this at a later point
+    if (currentState) {
+      this.currentState = currentState // Set the current state if provided
+    }
   }
 
   /**
