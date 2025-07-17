@@ -116,12 +116,14 @@ export default {
 
       if (!this.labelManager.doesAlreadyExist(this.newClassName)) {
         this.labelManager.addLabel(this.newClassName)
+        this.newClassName = '' // Clear the input field after saving
       } else {
         this.$q.notify({
           type: 'negative',
           message: 'Label already exists!',
           position: 'top',
         })
+        this.newClassName = '' // Clear the input field after saving
       }
     },
   },
