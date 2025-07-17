@@ -136,8 +136,8 @@ export default {
      * Saves the current annotation to the store
      */
     save() {
-      this.annotationManager.annotations[this.currentIndex].entities =
-        this.tokenManager.tokenBlocks.map((block: TMTokenBlock) => block.exportAsEntity())
+      this.annotationManager.annotations[this.currentIndex].entities = 
+        this.tokenManager.tokenBlocks.map((block: TMTokenBlock) => block.exportAsEntity());
     },
     beforeLeave() {
       return 'Leaving this page will discard any unsaved changes.'

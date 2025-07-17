@@ -66,6 +66,7 @@ export class TMTokenBlock implements TMTokens {
       this.history,
       this.labelClass,
       this.reviewed, // Indicates if the entity has been reviewed
+      this.currentState, // Current state of the entity
     )
   }
 }
