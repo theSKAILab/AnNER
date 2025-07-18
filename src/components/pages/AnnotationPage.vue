@@ -6,7 +6,7 @@
         :is="t.type === 'token' ? 'Token' : 'TokenBlock'"
         v-for="t in this.tokenManager.tokens"
         :key="`${t.type}-${t.start}`"
-        :token="t.type == 'token-block'? this.tokenManager.getBlockByStart(t.start): t"
+        :token="t.type == 'token-block' ? this.tokenManager.getBlockByStart(t.start) : t"
         :class="[t.reviewed ? 'user-active' : 'user-inactive']"
         @remove-block="onRemoveBlock"
       />

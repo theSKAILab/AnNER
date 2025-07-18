@@ -169,7 +169,7 @@ export class Entity {
       this.labelName = labelClass.name // Set the label name from the label class
     }
     this.setFromLastHistoryEntry() // Set the current state, name, and label class from the last history entry
-    
+
     // Not sure why I have to do it this way, but it works for now
     // TODO improve this at a later point
     if (currentState) {

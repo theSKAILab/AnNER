@@ -54,7 +54,9 @@ export default {
      * Adds a new block to the TokenManager based on the current selection
      */
     selectTokens(e: MouseEvent) {
-      if (e.detail > 1) { return } // Prevent double-click from selecting text
+      if (e.detail > 1) {
+        return
+      } // Prevent double-click from selecting text
       const selection: Selection | null = document.getSelection()
       if (
         selection?.anchorOffset === selection?.focusOffset &&
@@ -106,7 +108,7 @@ export default {
               end,
               this.labelManager.currentLabel,
               'Suggested',
-              []
+              [],
             )
           })
       } else {
@@ -115,7 +117,7 @@ export default {
           end,
           this.labelManager.currentLabel,
           this.currentPage == 'annotate' ? 'Candidate' : 'Suggested',
-          []
+          [],
         )
         if (this.tokenManager.getBlockByStart(start)) this.undoManager.addCreateUndo(start)
       }
@@ -137,8 +139,8 @@ export default {
      * Saves the current annotation to the store
      */
     save() {
-      this.annotationManager.annotations[this.currentIndex].entities = 
-        this.tokenManager.tokenBlocks.map((block: TMTokenBlock) => block.exportAsEntity());
+      this.annotationManager.annotations[this.currentIndex].entities =
+        this.tokenManager.tokenBlocks.map((block: TMTokenBlock) => block.exportAsEntity())
     },
     beforeLeave() {
       return 'Leaving this page will discard any unsaved changes.'
