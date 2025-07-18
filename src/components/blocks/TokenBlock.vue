@@ -125,39 +125,39 @@ export default {
 </script>
 
 <style lang="scss">
-i {
-  cursor: pointer;
-}
-mark {
-  padding: 0.7rem;
-  /* Increased from 0.5rem */
-  position: relative;
-  background-color: burlywood;
-  border: 2px solid $grey-7;
-  /* Thicker border for emphasis */
-  border-radius: 0.5rem;
-  /* Larger border-radius */
-}
+  i {
+    cursor: pointer;
+  }
+  mark {
+    padding: 0.7rem;
+    /* Increased from 0.5rem */
+    position: relative;
+    background-color: burlywood;
+    border: 2px solid $grey-7;
+    /* Thicker border for emphasis */
+    border-radius: 0.5rem;
+    /* Larger border-radius */
+  }
 
-.tag {
-  background-color: whitesmoke;
-  padding: 6px 0 8px 16px;
-  /* Increased padding for larger tag area */
-  border: 2px solid grey;
-  /* Thicker border */
-  border-radius: 0.5rem;
-  /* Larger border-radius */
-  font-size: small;
-  /* Increased font size for better visibility */
-}
+  .tag {
+    background-color: whitesmoke;
+    padding: 6px 0 8px 16px;
+    /* Increased padding for larger tag area */
+    border: 2px solid grey;
+    /* Thicker border */
+    border-radius: 0.5rem;
+    /* Larger border-radius */
+    font-size: small;
+    /* Increased font size for better visibility */
+  }
 
-.shadow-unreviewed {
-  box-shadow: 0 0 2px 2px goldenrod;
-  /* Larger and more pronounced shadow */
-}
+  .shadow-unreviewed {
+    box-shadow: 0 0 2px 2px goldenrod;
+    /* Larger and more pronounced shadow */
+  }
 
-.bg-red {
-  box-shadow: 0 0 2px 2px red;
-  /* Larger and more pronounced shadow */
-}
+  .bg-red {
+    box-shadow: 0 0 2px 2px red;
+    /* Larger and more pronounced shadow */
+  }
 </style>
