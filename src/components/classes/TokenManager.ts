@@ -37,7 +37,7 @@ export class TMTokenBlock implements TMTokens {
   public labelClass: Label
   public reviewed: boolean
   public history: History[]
-  public originalState: TMTokenBlock;
+  public originalState: TMTokenBlock
 
   constructor(
     start: number,
@@ -55,7 +55,7 @@ export class TMTokenBlock implements TMTokens {
     this.currentState = currentState
     this.reviewed = reviewed
     this.history = history
-    this.originalState = {...this};
+    this.originalState = { ...this }
   }
 
   public exportAsEntity(): Entity {
@@ -127,20 +127,20 @@ export class TokenManager {
     end: number,
     labelClass: Label | undefined,
     currentState: string,
-    history: History[] = []
+    history: History[] = [],
   ): void {
     let selectionStart: number = end < start ? end : start
     let selectionEnd: number = end > start ? end : start
-    
+
     const overlappedBlocks: TMTokens[] | null = this.isOverlapping(selectionStart, selectionEnd)
-    
+
     // If there are any overlapping TMTokenBlocks, we need to handle that edge case
     // This will use the properties of the first returned block
     // to overwrite the properties of the new block
     if (overlappedBlocks) {
       overlappedBlocks.sort((a, b) => a.start - b.start)
-      history = overlappedBlocks[0].history;
-      
+      history = overlappedBlocks[0].history
+
       for (const block of overlappedBlocks) {
         this.removeBlock(block.start, true) // Remove the block and reintroduce tokens (we will grab them later)
       }
@@ -154,13 +154,13 @@ export class TokenManager {
         selectionEnd = overlappedBlocks[overlappedBlocks.length - 1].end
       }
     }
-    
-    const targetedBlocks: TMTokens[] = this.blocksInRange(selectionStart, selectionEnd);
+
+    const targetedBlocks: TMTokens[] = this.blocksInRange(selectionStart, selectionEnd)
 
     // Remove old blocks in prep for new blocks
     for (let i = 0; i < targetedBlocks.length; i++) {
       this.tokens = this.tokens.filter((token: TMTokens) => {
-        return (token.start != targetedBlocks[i].start)
+        return token.start != targetedBlocks[i].start
       })
     }
 
@@ -175,7 +175,7 @@ export class TokenManager {
         currentState,
         false, // reviewed
         history,
-      )
+      ),
     )
 
     this.tokens.sort((a, b) => a.start - b.start)
@@ -187,27 +187,26 @@ export class TokenManager {
       entity.end,
       entity.labelClass,
       entity.currentState || 'Candidate',
-      entity.history || []
+      entity.history || [],
     )
     this.edited++
   }
 
   public removeBlock(start: number, reintroduceTokens: boolean = true): void {
-
-    const targetBlock: TMTokens|null = this.getBlockByStart(start);
+    const targetBlock: TMTokens | null = this.getBlockByStart(start)
 
     // Verify that the block exists before proceeding
     if (targetBlock) {
       this.tokens = this.tokens.filter((token: TMTokens) => {
-        return (token.start != start)
+        return token.start != start
       })
 
-      if (reintroduceTokens && (targetBlock instanceof TMTokenBlock)) {
-        this.tokens.push(...targetBlock?.tokens);
+      if (reintroduceTokens && targetBlock instanceof TMTokenBlock) {
+        this.tokens.push(...targetBlock?.tokens)
       }
 
       this.edited++
-      this.tokens.sort((a, b) => a.start - b.start);
+      this.tokens.sort((a, b) => a.start - b.start)
     }
   }
 
@@ -245,12 +244,12 @@ export class TokenManager {
   }
 
   public restoreOriginalBlockState(start: number): void {
-    const targetBlock: TMTokenBlock | null = this.getBlockByStart(start);
-    
+    const targetBlock: TMTokenBlock | null = this.getBlockByStart(start)
+
     // Verify that the block exists before proceeding
     if (targetBlock) {
-      targetBlock.restoreOriginalState();
-      this.edited++;
+      targetBlock.restoreOriginalState()
+      this.edited++
     }
   }
 }

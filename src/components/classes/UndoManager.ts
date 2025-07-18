@@ -83,7 +83,7 @@ class UndoAction {
         tokenManager.removeBlock(this.start as number)
         break
       case UndoAction.OverlappingAction:
-        let earliestStart: number | null = null;
+        let earliestStart: number | null = null
         const overlappingBlocks: TMTokenBlock[] = this.block as TMTokenBlock[]
 
         if (this.start < overlappingBlocks[0].start) {
