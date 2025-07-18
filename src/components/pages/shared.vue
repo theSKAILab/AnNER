@@ -53,7 +53,8 @@ export default {
     /**
      * Adds a new block to the TokenManager based on the current selection
      */
-    selectTokens() {
+    selectTokens(e: MouseEvent) {
+      if (e.detail > 1) { return } // Prevent double-click from selecting text
       const selection: Selection | null = document.getSelection()
       if (
         selection?.anchorOffset === selection?.focusOffset &&

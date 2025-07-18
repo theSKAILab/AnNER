@@ -62,11 +62,11 @@ export default {
     if (this.annotationManager.inputSentences.length) {
       this.tokenizeCurrentSentence()
     }
-    document.addEventListener('mouseup', this.selectTokens)
+    document.addEventListener('mouseup', (e) => this.selectTokens(e))
     window.onbeforeunload = this.beforeLeave
 
     // Emits
-    this.emitter.on('tokenizeCurrentSentence', this.tokenizeCurrentSentence)
+    this.emitter.on('tokenizeCurrentSentence', (e) => this.selectTokens(e))
   },
   beforeUnmount() {
     document.removeEventListener('mouseup', this.selectTokens)
