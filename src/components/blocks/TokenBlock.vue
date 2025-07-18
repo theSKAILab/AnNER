@@ -1,6 +1,6 @@
 <template>
   <mark
-    :class="['bg-' + this.labelClass.color, { 'shadow-unreviewed': !this.reviewed }]"
+    :class="['bg-' + this.token.labelClass.color, { 'shadow-unreviewed': !this.token.reviewed }]"
     style="margin-left: 5px; margin-right: 5px"
   >
     <Token v-for="t in token.tokens" :key="t.start" :token="t" />
@@ -8,12 +8,12 @@
       <!-- Toggle status cycle button -->
       <i
         v-if="this.currentPage === 'review'"
-        :class="this.states[this.currentState].icon"
+        :class="this.states[this.token.currentState].icon"
         @click="cycleCurrentStatus"
-        :title="[this.currentState + ' - Click to cycle status']"
+        :title="[this.token.currentState + ' - Click to cycle status']"
         style="cursor: pointer; color: grey-9"
       ></i>
-      {{ this.labelClass.name }}
+      {{ this.token.labelClass.name }}
       <!-- Replace label button (double arrows) -->
       <q-btn
         icon="fa fa-exchange-alt"
@@ -36,7 +36,7 @@
       />
       <q-btn
         v-if="this.currentPage === 'review'"
-        :icon="this.reviewed ? 'fas fa-toggle-on' : 'fas fa-toggle-off'"
+        :icon="this.token.reviewed ? 'fas fa-toggle-on' : 'fas fa-toggle-off'"
         round
         flat
         size="xs"
@@ -60,15 +60,9 @@ export default {
   },
   props: [
     'token',
-    'currentState', // v-model
-    'labelClass', // v-model
-    'reviewed', // v-model
-    'history',
   ],
   emits: [
-    'update:currentState', // v-model
-    'update:labelClass', // v-model
-    'update:reviewed', // v-model
+    'remove-block'
   ],
   data() {
     return {
@@ -77,48 +71,45 @@ export default {
         Accepted: { numeric: 1, icon: 'fas fa-thumbs-up fa-lg' },
         Rejected: { numeric: 2, icon: 'fas fa-thumbs-down fa-lg' },
         Suggested: { numeric: 3, icon: 'fas fa-pen fa-lg' },
-      },
+      }
     }
   },
   computed: {
-    ...mapState(['currentPage', 'labelManager', 'undoManager']),
+    ...mapState(['currentPage', 'labelManager', 'undoManager', 'tokenManager']),
   },
   methods: {
-    ...mapMutations(['addUndoUpdate']),
     cycleCurrentStatus() {
       this.undoManager.addUpdateUndo({ ...this.token })
-      const nextState = Object.keys(this.states)[(this.states[this.currentState].numeric + 1) % 3] // Cycle through Candidate, Accepted, Rejected
-      this.setReviewed(true)
-      this.updateState(nextState)
+      const nextState = Object.keys(this.states)[(this.states[this.token.currentState].numeric + 1) % 3] // Cycle through Candidate, Accepted, Rejected
+      
+      this.token.currentState = nextState
+      this.token.reviewed = true
     },
     changeClass() {
       this.undoManager.addUpdateUndo({ ...this.token })
-      this.setReviewed(true)
+      this.token.reviewed = true
       if (this.currentPage === 'review') {
-        this.updateState('Suggested')
+        this.token.currentState = 'Suggested'
       }
-      this.updateLabelClass()
-    },
-    updateState(newState) {
-      this.$emit('update:currentState', newState)
-    },
-    updateLabelClass() {
-      this.$emit('update:labelClass', this.labelManager.currentLabel)
+      this.token.labelClass = this.labelManager.selectedLabel
     },
     removeBlock() {
       if (this.currentPage == 'review') {
         this.undoManager.addUpdateUndo({ ...this.token })
-        this.updateState('Rejected')
-        this.setReviewed(true)
+        this.token.currentState = 'Rejected'
+        this.token.reviewed = true
       } else {
         this.$emit('remove-block', this.token.start)
       }
     },
     toggleReviewed() {
-      this.$emit('update:reviewed', !this.reviewed)
-    },
-    setReviewed(state) {
-      this.$emit('update:reviewed', state)
+      if (this.token.reviewed) {
+        // Undo all changes made to this block since the last reviewer (initial token manager load)
+        this.tokenManager.restoreOriginalBlockState(this.token.start)
+      } else {
+        this.token.reviewed = !this.reviewed
+      }
+      
     },
   },
 }
