@@ -1,6 +1,6 @@
 <script lang="ts">
 import { mapMutations, mapState } from 'vuex'
-import Tokenizer from '../classes/tokenizer'
+import Tokenizer from '../classes/Tokenizer'
 import { TokenManager, TMTokenBlock } from '../classes/TokenManager'
 
 export default {
