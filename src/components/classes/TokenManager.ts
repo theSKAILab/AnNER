@@ -32,12 +32,12 @@ export class TMTokenBlock implements TMTokens {
   public start: number
   public end: number
   public currentState: string
-  public previousState?: string // Optional field for previous state in review mode
 
   public tokens: TMToken[]
   public labelClass: Label
   public reviewed: boolean
   public history: History[]
+  public originalState: TMTokenBlock;
 
   constructor(
     start: number,
@@ -55,6 +55,7 @@ export class TMTokenBlock implements TMTokens {
     this.currentState = currentState
     this.reviewed = reviewed
     this.history = history
+    this.originalState = {...this};
   }
 
   public exportAsEntity(): Entity {
@@ -66,6 +67,18 @@ export class TMTokenBlock implements TMTokens {
       this.reviewed, // Indicates if the entity has been reviewed
       this.currentState, // Current state of the entity
     )
+  }
+
+  public restoreOriginalState(): void {
+    console.log(this.originalState)
+    // Should not need to restore these properties as they are not modified
+    // this.start = this.originalState.start
+    // this.end = this.originalState.end
+    // this.tokens = this.originalState.tokens
+    // this.history = this.originalState.history
+    this.labelClass = this.originalState.labelClass
+    this.currentState = this.originalState.currentState
+    this.reviewed = this.originalState.reviewed
   }
 }
 
@@ -203,7 +216,7 @@ export class TokenManager {
     this.edited++
   }
 
-  public getBlockByStart(start: number): TMToken | null {
+  public getBlockByStart(start: number): TMTokenBlock | null {
     for (let i = 0; i < this.tokens.length; i++) {
       const token: TMTokens = this.tokens[i]
       if (token.type === 'token-block' && token.start === start) {
@@ -229,6 +242,16 @@ export class TokenManager {
     }
 
     return overlappingBlocks.length > 0 ? overlappingBlocks : null
+  }
+
+  public restoreOriginalBlockState(start: number): void {
+    const targetBlock: TMTokenBlock | null = this.getBlockByStart(start);
+    
+    // Verify that the block exists before proceeding
+    if (targetBlock) {
+      targetBlock.restoreOriginalState();
+      this.edited++;
+    }
   }
 }
 
