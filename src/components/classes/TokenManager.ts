@@ -5,7 +5,6 @@ export interface TMTokens {
   start: number
   end: number
   currentState: string | undefined
-  previousState?: string | undefined // Optional field for previous state in review mode
 }
 
 export class TMToken implements TMTokens {
@@ -13,7 +12,6 @@ export class TMToken implements TMTokens {
   public start: number
   public end: number
   public currentState: string
-  public previousState?: string // Optional field for previous state in review mode
 
   public text: string
 
