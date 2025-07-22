@@ -40,7 +40,7 @@
         <q-input
           bottom-slots
           v-model="newClassName"
-          v-if="$store.state.currentPage !== 'review' || this.allLabels.length == 0"
+          v-if="showNewClassInput || this.allLabels.length == 0"
           hint="Enter a NER Tag and click [+] to add it"
           dense
           autofocus
@@ -62,8 +62,8 @@
         <q-btn
           v-if="$store.state.currentPage !== 'review'"
           outline
-          @click="showNewClassInput = true"
-          label="New Tag"
+          @click="showNewClassInput = !showNewClassInput"
+          :label="showNewClassInput ? 'Cancel': 'Add Tag'"
           class="q-mr-sm"
           :color="$q.dark.isActive ? 'grey-3' : 'grey-9'"
         />
@@ -87,6 +87,7 @@ export default {
     return {
       newClassName: '',
       showDeleteButtons: false,
+      showNewClassInput: false
     }
   },
   computed: {
