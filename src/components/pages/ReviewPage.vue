@@ -14,8 +14,7 @@
     <info-bar />
   </div>
 </template>
-<script>
-import { mapState } from 'vuex'
+<script lang="ts">
 import Token from '../blocks/Token'
 import TokenBlock from '../blocks/TokenBlock'
 import LabelsBlock from '../blocks/LabelsBlock.vue'
@@ -31,7 +30,6 @@ export default {
     InfoBar,
   },
   computed: {
-    ...mapState(['annotations']),
     // TODO: THIS SHOULD BE REWRITTEN BETTER
     eligibleTokens() {
       const renderedList = []

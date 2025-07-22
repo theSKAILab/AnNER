@@ -14,8 +14,7 @@
     <info-bar />
   </div>
 </template>
-<script>
-import { mapState } from 'vuex'
+<script lang="ts">
 import Token from '../blocks/Token'
 import TokenBlock from '../blocks/TokenBlock'
 import LabelsBlock from '../blocks/LabelsBlock.vue'
@@ -29,9 +28,6 @@ export default {
     TokenBlock,
     LabelsBlock,
     InfoBar,
-  },
-  computed: {
-    ...mapState(['currentIndex']),
   },
   created() {
     // Add blocks for all paragraphs
