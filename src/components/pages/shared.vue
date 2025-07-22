@@ -24,10 +24,15 @@ export default {
   watch: {
     tmEdited: {
       handler() {
+        this.tokenizeCurrentSentence()
         this.save()
       },
       deep: true,
     },
+    currentIndex() {
+      this.tokenizeCurrentSentence()
+      this.save()
+    }
   },
   methods: {
     ...mapMutations([
