@@ -70,7 +70,6 @@ export class TMTokenBlock implements TMTokens {
   }
 
   public restoreOriginalState(): void {
-    console.log(this.originalState)
     // Should not need to restore these properties as they are not modified
     // this.start = this.originalState.start
     // this.end = this.originalState.end
@@ -86,6 +85,7 @@ export class TokenManager {
   public labelManager: LabelManager
   public tokens: TMTokens[] // Array of TMToken or TMTokenBlock objects
   public edited: number = 0 // Counter for edits
+
   public get tokenBlocks(): TMTokenBlock[] {
     return this.tokens.filter((token: TMTokens) => token instanceof TMTokenBlock) as TMTokenBlock[]
   }
@@ -129,8 +129,8 @@ export class TokenManager {
     currentState: string,
     history: History[] = [],
   ): void {
-    let selectionStart: number = end < start ? end : start
-    let selectionEnd: number = end > start ? end : start
+    const selectionStart: number = end < start ? end : start
+    const selectionEnd: number = end > start ? end : start
 
     const overlappedBlocks: TMTokens[] | null = this.isOverlapping(selectionStart, selectionEnd)
 
@@ -138,20 +138,14 @@ export class TokenManager {
     // This will use the properties of the first returned block
     // to overwrite the properties of the new block
     if (overlappedBlocks) {
+      console.log('Overlapping blocks found:', overlappedBlocks)
       overlappedBlocks.sort((a, b) => a.start - b.start)
       history = overlappedBlocks[0].history
 
       for (const block of overlappedBlocks) {
-        this.removeBlock(block.start, true) // Remove the block and reintroduce tokens (we will grab them later)
-      }
-
-      // We now need to adjust the selection start and end
-      // to the first and last blocks in the overlapping blocks
-      if (overlappedBlocks[0].start < selectionStart) {
-        selectionStart = overlappedBlocks[0].start
-      }
-      if (overlappedBlocks[overlappedBlocks.length - 1].end > selectionEnd) {
-        selectionEnd = overlappedBlocks[overlappedBlocks.length - 1].end
+        this.tokens = this.tokens.filter((token: TMTokens) => { return token.start != block.start }) // Remove the block from the tokens array;
+        this.tokens.push(...(block as TMTokenBlock).tokens) // Reintroduce the tokens from the block
+        this.tokens.sort((a, b) => a.start - b.start) // Sort the tokens array
       }
     }
 
@@ -230,10 +224,11 @@ export class TokenManager {
 
     for (let i = 0; i < this.tokens.length; i++) {
       const currentToken: TMTokens = this.tokens[i]
-      if (currentToken.type === 'token-block') {
+      if (currentToken instanceof TMTokenBlock) {
         if (
           (start >= currentToken.start && start <= currentToken.end) ||
-          (end >= currentToken.start && end <= currentToken.end)
+          (end >= currentToken.start && end <= currentToken.end) ||
+          (currentToken.start >= start && currentToken.end <= end)
         ) {
           overlappingBlocks.push(currentToken)
         }
