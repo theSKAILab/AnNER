@@ -6,7 +6,14 @@
 //       "color": "CLASS_COLOR"
 //     }
 //   ],
-
+export type ClassesJSONFormat = {
+  classes: LabelJSONFormat[]
+}
+type LabelJSONFormat = {
+  id: number
+  name: string
+  color: string
+}
 const labelColors = [
   'red-11',
   'blue-11',
@@ -28,23 +35,19 @@ const labelColors = [
   'green-11',
   'orange-11',
 ]
-
 export class Label {
   public id: number
   public name: string
   public color: string
-
   constructor(id: number, name: string, color: string) {
     this.id = id
     this.name = name
     this.color = color
   }
 }
-
 export class LabelManager {
   private labels: Label[] = []
   public currentLabel: Label | undefined
-
   // Getters
   public get allLabels(): Label[] {
     return this.labels
@@ -52,12 +55,10 @@ export class LabelManager {
   public get lastId(): number {
     return this.labels.length
   }
-
   constructor(initialLabels: Label[] = []) {
     this.labels = initialLabels
     this.currentLabel = this.labels.length > 0 ? this.labels[0] : undefined
   }
-
   public doesAlreadyExist(newLabel: string): boolean {
     let labelExists: boolean = false
     this.labels.forEach((label) => {
@@ -67,30 +68,24 @@ export class LabelManager {
     })
     return labelExists
   }
-
   public addLabel(name: string) {
     this.labels.push(new Label(this.labels.length + 1, name, this.generateRandomColor()))
     if (this.labels.length === 1) {
       this.currentLabel = this.labels[0] // Set the first label as current if it's the first one added
     }
   }
-
   public deleteLabel(name: string) {
     this.labels = this.labels.filter((label) => label.name != name)
   }
-
   public getLabelByName(name: string): Label | undefined {
     return this.labels.find((label) => label.name == name)
   }
-
   public generateRandomColor(): string {
     return labelColors[this.lastId % labelColors.length]
   }
-
-  public static fromJSON(json: Label[]): LabelManager {
+  public static fromJSON(json: LabelJSONFormat[]): LabelManager {
     return new LabelManager(json.map((c: Label) => new Label(c.id, c.name, c.color)))
   }
-
   public setCurrentLabel(name: string): void {
     const label = this.getLabelByName(name)
     if (label) {
@@ -99,8 +94,7 @@ export class LabelManager {
       throw new Error(`Label with name ${name} does not exist.`)
     }
   }
-
-  public toJSON(): object {
+  public toJSON(): LabelJSONFormat[] {
     return this.labels.map((label) => ({
       id: label.id,
       name: label.name,

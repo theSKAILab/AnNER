@@ -2,9 +2,19 @@
 import { mapMutations, mapState } from 'vuex'
 import Tokenizer from '../classes/Tokenizer'
 import { TokenManager, TMTokenBlock } from '../classes/TokenManager'
+import Token from '../blocks/Token'
+import TokenBlock from '../blocks/TokenBlock'
+import LabelsBlock from '../blocks/LabelsBlock.vue'
+import InfoBar from '../toolbars/InfoBar.vue'
 
 export default {
   name: 'SharedEditorFunctions',
+  components: {
+    Token,
+    TokenBlock,
+    LabelsBlock,
+    InfoBar,
+  },
   computed: {
     ...mapState([
       'currentPage',
@@ -32,7 +42,7 @@ export default {
     currentIndex() {
       this.tokenizeCurrentSentence()
       this.save()
-    }
+    },
   },
   methods: {
     ...mapMutations([

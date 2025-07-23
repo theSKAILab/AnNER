@@ -63,7 +63,7 @@
           v-if="$store.state.currentPage !== 'review'"
           outline
           @click="showNewClassInput = !showNewClassInput"
-          :label="showNewClassInput ? 'Cancel': 'Add Tag'"
+          :label="showNewClassInput ? 'Cancel' : 'Add Tag'"
           class="q-mr-sm"
           :color="$q.dark.isActive ? 'grey-3' : 'grey-9'"
         />
@@ -87,7 +87,7 @@ export default {
     return {
       newClassName: '',
       showDeleteButtons: false,
-      showNewClassInput: false
+      showNewClassInput: false,
     }
   },
   computed: {

@@ -1,5 +1,6 @@
 import { Entity, History, Paragraph } from './AnnotationManager'
 import { Label, LabelManager } from './LabelManager'
+import type { TokenizerSpans } from './Tokenizer'
 
 export interface TMTokens {
   start: number
@@ -22,7 +23,7 @@ export class TMToken implements TMTokens {
     this.currentState = currentState
   }
 
-  public static fromObject(obj: object[]): TMToken {
+  public static fromObject(obj: TokenizerSpans): TMToken {
     return new TMToken(obj[0], obj[1], obj[2], 'Candidate')
   }
 }
@@ -92,11 +93,11 @@ export class TokenManager {
 
   constructor(
     labelManager: LabelManager,
-    tokens: object[],
+    tokens: TokenizerSpans[],
     currentParagraph: Paragraph | null = null,
   ) {
     this.labelManager = labelManager
-    this.tokens = tokens.map((t: object) => TMToken.fromObject(t))
+    this.tokens = tokens.map((t: TokenizerSpans) => TMToken.fromObject(t))
     this.edited = 0
     if (currentParagraph) {
       // Reset previous annotation state
@@ -140,10 +141,13 @@ export class TokenManager {
     if (overlappedBlocks) {
       console.log('Overlapping blocks found:', overlappedBlocks)
       overlappedBlocks.sort((a, b) => a.start - b.start)
-      history = overlappedBlocks[0].history
+
+      if (overlappedBlocks[0] instanceof TMTokenBlock) history = overlappedBlocks[0].history
 
       for (const block of overlappedBlocks) {
-        this.tokens = this.tokens.filter((token: TMTokens) => { return token.start != block.start }) // Remove the block from the tokens array;
+        this.tokens = this.tokens.filter((token: TMTokens) => {
+          return token.start != block.start
+        }) // Remove the block from the tokens array;
         this.tokens.push(...(block as TMTokenBlock).tokens) // Reintroduce the tokens from the block
         this.tokens.sort((a, b) => a.start - b.start) // Sort the tokens array
       }
@@ -212,7 +216,7 @@ export class TokenManager {
   public getBlockByStart(start: number): TMTokenBlock | null {
     for (let i = 0; i < this.tokens.length; i++) {
       const token: TMTokens = this.tokens[i]
-      if (token.type === 'token-block' && token.start === start) {
+      if (token instanceof TMTokenBlock && token.start === start) {
         return token
       }
     }

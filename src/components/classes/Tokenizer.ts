@@ -1,3 +1,11 @@
+// Tokenizer types
+
+export type TokenizerSpans = [
+  start: number, // start index of the token
+  end: number, // end index of the token
+  token: string, // the token itself
+]
+
 abstract class Tokenizer {
   // Explanation of the regex used for tokenization:
   // First Part: [\w\-\'\"\[\]\(\)]+
@@ -9,14 +17,14 @@ abstract class Tokenizer {
   // This part matches any single non-whitespace character.
   public static regex = /[\w\-\'\"\[\]\(\)]+|\$[\d\.\S]|\S/gm
 
-  public static tokenize(text) {
-    const tokens = text.match(new RegExp(this.regex, 'g'))
+  public static tokenize(text: string): string[] {
+    const tokens: RegExpMatchArray | null = text.match(new RegExp(this.regex, 'g'))
     return tokens ? tokens.map((token) => token.trim()) : []
   }
 
-  public static span_tokenize(text) {
-    const tokens = this.tokenize(text)
-    const spans = []
+  public static span_tokenize(text: string): TokenizerSpans[] {
+    const tokens: string[] = this.tokenize(text)
+    const spans: TokenizerSpans[] = []
 
     let startIndex = 0
     for (const token of tokens) {
@@ -25,7 +33,6 @@ abstract class Tokenizer {
       spans.push([start, end, token])
       startIndex = end
     }
-
     return spans
   }
 }
