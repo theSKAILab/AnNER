@@ -15,20 +15,10 @@
   </div>
 </template>
 <script lang="ts">
-import Token from '../blocks/Token'
-import TokenBlock from '../blocks/TokenBlock'
-import LabelsBlock from '../blocks/LabelsBlock.vue'
-import InfoBar from '../toolbars/InfoBar.vue'
 import SharedEditorFunctions from './shared.vue'
 
 export default {
   name: 'AnnotationPage',
-  components: {
-    Token,
-    TokenBlock,
-    LabelsBlock,
-    InfoBar,
-  },
   created() {
     // Add blocks for all paragraphs
     if (this.annotationManager.inputSentences.length) {

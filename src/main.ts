@@ -1,19 +1,22 @@
-import './registerServiceWorker'
-// import 'es6-promise/auto'
-import 'quasar/src/css/index.sass'
-
+// Import Vue and other necessary libraries
 import { createApp } from 'vue'
-import { createStore } from 'vuex'
-import { Quasar } from 'quasar'
 import App from './App.vue'
-import mitt from 'mitt'
-import store from './store'
 
+// Plugin Imports
+import './registerServiceWorker'
+import mitt from 'mitt'
+
+// Store Imports
+import { store, key } from './components/classes/Store'
+
+// Quasar and Plugin Imports
 import './styles/quasar.scss'
-import iconSet from 'quasar/icon-set/fontawesome-v5.js'
 import '@quasar/extras/fontawesome-v5/fontawesome-v5.css'
 import '@quasar/extras/ionicons-v4/ionicons-v4.css'
+import 'quasar/src/css/index.sass'
 import { Notify, Dialog } from 'quasar'
+import { Quasar } from 'quasar'
+import iconSet from 'quasar/icon-set/fontawesome-v5.js'
 
 const app = createApp(App)
   .use(Quasar, {
@@ -24,7 +27,7 @@ const app = createApp(App)
     },
     iconSet: iconSet,
   })
-  .use(createStore(store))
+  .use(store, key)
 
 app.config.globalProperties.emitter = mitt()
 
