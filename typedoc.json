@@ -1,0 +1,15 @@
+{
+    "entryPoints": [
+        "src/components/classes/*.ts"
+    ],
+    "name": "AnNER Documentation",
+    "includeVersion": true,
+    "sourceLinkExternal": true,
+    "markdownLinkExternal": true,
+    "hideGenerator": true,
+    "navigationLinks": {
+        "GitHub": "https://github.com/theSKAILab/AnNER",
+        "Tool": "https://theskailab.github.io/AnNER/"
+    },
+    "favicon": "https://raw.githubusercontent.com/theSKAILab/AnNER/refs/heads/main/public/favicon.ico",
+}
