@@ -20,7 +20,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       devOptions: {
           enabled: true
-        } 
+        },
+      workbox: {
+        navigateFallbackDenylist: [/^\/pr-preview/, /^\/docs/]
+      }
     })
   ],
   resolve: {
