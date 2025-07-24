@@ -27,5 +27,9 @@
     },
     "sidebarLinks": {
         "README": "/"
-    }
+    },
+    "plugin": [
+        "typedoc-material-theme"
+    ],
+    "themeColor": "#002a5c",
 }
