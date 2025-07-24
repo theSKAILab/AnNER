@@ -1,6 +1,7 @@
 {
     "entryPoints": [
-        "src/components/classes/*.ts"
+        "src/components/managers/*.ts",
+        "src/components/types/*.ts"
     ],
     "name": "AnNER Documentation",
     "includeVersion": true,

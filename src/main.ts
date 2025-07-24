@@ -7,7 +7,7 @@ import './registerServiceWorker'
 import mitt from 'mitt'
 
 // Store Imports
-import { store, key } from './components/classes/Store'
+import { store, key } from './components/managers/Store'
 
 // Quasar and Plugin Imports
 import './styles/quasar.scss'

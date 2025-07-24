@@ -1,10 +1,11 @@
-import type TokenManager from '@/components/classes/TokenManager.ts'
-import { AnnotationManager } from '@/components/classes/AnnotationManager.ts'
-import { LabelManager, type ClassesJSONFormat } from '@/components/classes/LabelManager.ts'
-import { UndoManager } from '@/components/classes/UndoManager.ts'
+import type TokenManager from '@/components/managers/TokenManager.ts'
+import { AnnotationManager } from '@/components/managers/AnnotationManager.ts'
+import { LabelManager } from '@/components/managers/LabelManager.ts'
+import { UndoManager } from '@/components/managers/UndoManager.ts'
 
 import { createStore, Store } from 'vuex'
 import type { InjectionKey } from 'vue'
+import type { REF_ClassesJSONFormat } from '../types/REFFile'
 
 const mutations = {
   // File Loading
@@ -27,7 +28,7 @@ const mutations = {
     if (state.fileName.split('.')[1] == 'json') {
       // Loading a JSON file
       state.annotationManager = AnnotationManager.fromJSON(payload)
-      const classesJSON: ClassesJSONFormat = JSON.parse(payload)
+      const classesJSON: REF_ClassesJSONFormat = JSON.parse(payload)
       state.labelManager = LabelManager.fromJSON(classesJSON.classes)
     } else {
       // Loading a text file
