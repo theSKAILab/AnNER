@@ -78,8 +78,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: anner-tool
-      - name: Create docs Directory
-        run: mkdir docs/
       - name: Download Docs Artifact
         uses: actions/download-artifact@v4
         with:
