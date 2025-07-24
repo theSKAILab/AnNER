@@ -3,7 +3,7 @@
         "src/components/managers/*.ts",
         "src/components/types/*.ts"
     ],
-    "name": "AnNER Documentation",
+    "name": "Documentation",
     "includeVersion": true,
     "sourceLinkExternal": true,
     "markdownLinkExternal": true,
@@ -13,4 +13,19 @@
         "Tool": "https://theskailab.github.io/AnNER/"
     },
     "favicon": "https://raw.githubusercontent.com/theSKAILab/AnNER/refs/heads/main/public/favicon.ico",
+    "navigation": {
+        "includeCategories": true,
+        "includeGroups": false,
+        "includeFolders": true,
+        "compactFolders": false,
+        "excludeReferences": true
+    },
+    "categorizeByGroup": false,
+    "headings": {
+        "readme": false,
+        "document": false
+    },
+    "sidebarLinks": {
+        "README": "/"
+    }
 }

@@ -8,7 +8,13 @@ import type { InjectionKey } from 'vue'
 import type { REF_ClassesJSONFormat } from '../types/REFFile'
 
 const mutations = {
-  // File Loading
+  /**
+   * Load a file into the store.
+   * @description This mutation processes the file and updates the store state accordingly.
+   * @param {State} state - The current state of the store.
+   * @param {File} file - The file to be loaded.
+   * @returns {void}
+   */
   loadFile(state: State, file: File): void {
     state.fileName = file.name
     const fileType = file.name.split('.').pop()
@@ -24,6 +30,14 @@ const mutations = {
       }
     })
   },
+
+  /**
+   * Process the file content and update the store state.
+   * @description This mutation processes the file content based on its type (JSON or text) and updates the annotation and label managers.
+   * @param {State} state - The current state of the store.
+   * @param {string} payload - The content of the file as a string.
+   * @returns {void}
+   */
   processFile(state: State, payload: string): void {
     if (state.fileName.split('.')[1] == 'json') {
       // Loading a JSON file
@@ -37,7 +51,11 @@ const mutations = {
     }
   },
 
-  // Navigation
+  /**
+   * Navigate to the next sentence in the annotation manager.
+   * @description This mutation increments the current index to move to the next sentence in the annotation manager.
+   * @param {State} state - The current state of the store.
+   */
   nextSentence(state: State): void {
     if (
       state.annotationManager &&
@@ -46,16 +64,34 @@ const mutations = {
       state.currentIndex += 1
     }
   },
+
+  /**
+   * Navigate to the previous sentence in the annotation manager.
+   * @description This mutation decrements the current index to move to the previous sentence in the annotation manager.
+   * @param {State} state - The current state of the store.
+   */
   previousSentence(state: State): void {
     if (state.currentIndex > 0) {
       state.currentIndex -= 1
     }
   },
+
+  /**
+   * Set the current page in the store.
+   * @description This mutation updates the current page state, which can be used for navigation or UI updates.
+   * @param {State} state - The current state of the store.
+   * @param {string} page - The name of the page to set as the current page.
+   */
   setCurrentPage(state: State, page: string): void {
     state.currentPage = page
   },
 
-  // Global Setters
+  /**
+   * Set the TokenManager in the store.
+   * @description This mutation initializes the TokenManager and sets it in the store state, along with the UndoManager.
+   * @param {State} state - The current state of the store.
+   * @param {TokenManager} tokenManager - The TokenManager instance to set in the store.
+   */
   setTokenManager(state: State, tokenManager: TokenManager): void {
     state.tokenManager = tokenManager
     state.undoManager = new UndoManager()
