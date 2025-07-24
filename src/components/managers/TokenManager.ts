@@ -1,13 +1,29 @@
 import { Entity, History, Paragraph } from './AnnotationManager'
 import { Label, LabelManager } from './LabelManager'
-import type { TokenizerSpans } from './Tokenizer'
+import type { TokenizerSpans } from '@/components/types/Tokenizer'
 
+/**
+ * Interface for TokenManager tokens.
+ * @description This interface defines the structure for tokens used in the TokenManager.
+ * @property {number} start - The start index of the token.
+ * @property {number} end - The end index of the token.
+ * @property {string | undefined} currentState - The current state of the token, can be undefined.
+ */
 export interface TMTokens {
   start: number
   end: number
   currentState: string | undefined
 }
 
+/**
+ * Class representing a token in the TokenManager.
+ * @description This class implements the TMTokens interface and represents a token with its start, end, text, and current state.
+ * @property {string} type - The type of the token, default is 'token'.
+ * @property {number} start - The start index of the token.
+ * @property {number} end - The end index of the token.
+ * @property {string} currentState - The current state of the token.
+ * @property {string} text - The text of the token.
+ */
 export class TMToken implements TMTokens {
   public type: string = 'token'
   public start: number
@@ -16,6 +32,14 @@ export class TMToken implements TMTokens {
 
   public text: string
 
+  /**
+   * Constructor for TMToken.
+   * @constructor
+   * @param {number} start - The start index of the token.
+   * @param {number} end - The end index of the token.
+   * @param {string} text - The text of the token.
+   * @param {string} currentState - The current state of the token.
+   */
   constructor(start: number, end: number, text: string, currentState: string) {
     this.start = start
     this.end = end
@@ -23,11 +47,29 @@ export class TMToken implements TMTokens {
     this.currentState = currentState
   }
 
+  /**
+   * Static method to create a TMToken from a TokenizerSpans object.
+   * @param {TokenizerSpans} obj - The TokenizerSpans object to convert.
+   * @returns {TMToken} - A new TMToken instance.
+   */
   public static fromObject(obj: TokenizerSpans): TMToken {
     return new TMToken(obj[0], obj[1], obj[2], 'Candidate')
   }
 }
 
+/**
+ * Class representing a block of tokens in the TokenManager.
+ * @description This class implements the TMTokens interface and represents a block of tokens with its start, end, label class, current state, and history.
+ * @property {string} type - The type of the token block, default is 'token-block'.
+ * @property {number} start - The start index of the token block.
+ * @property {number} end - The end index of the token block.
+ * @property {TMToken[]} tokens - An array of TMToken objects representing the tokens in the block.
+ * @property {Label} labelClass - The label class associated with the token block.
+ * @property {string} currentState - The current state of the token block.
+ * @property {boolean} reviewed - Indicates if the token block has been reviewed.
+ * @property {History[]} history - An array of history entries for the token block.
+ * @property {TMTokenBlock} originalState - The original state of the token block, used for restoring the block's state.
+ */
 export class TMTokenBlock implements TMTokens {
   public type: string = 'token-block' // Default type for token blocks
   public start: number
@@ -40,6 +82,19 @@ export class TMTokenBlock implements TMTokens {
   public history: History[]
   public originalState: TMTokenBlock
 
+  /**
+   * Constructor for TMTokenBlock.
+   * @description The constructor initializes the token block with the provided parameters and sets the original state to the current state.
+   * @constructor
+   * @param {number} start - The start index of the token block.
+   * @param {number} end - The end index of the token block.
+   * @param {TMToken[]} tokens - An array of TMToken objects representing the tokens in the block.
+   * @param {Label} labelClass - The label class associated with the token block.
+   * @param {string} currentState - The current state of the token block.
+   * @param {boolean} reviewed - Indicates if the token block has been reviewed, default is false.
+   * @param {History[]} history - An array of history entries for the token block, default is an empty array.
+   * @returns {void}
+   */
   constructor(
     start: number,
     end: number,
@@ -59,6 +114,11 @@ export class TMTokenBlock implements TMTokens {
     this.originalState = { ...this }
   }
 
+  /**
+   * Static method to create a TMTokenBlock from an Entity object.
+   * @param {Entity} entity - The Entity object to convert.
+   * @returns {TMTokenBlock} - A new TMTokenBlock instance.
+   */
   public exportAsEntity(): Entity {
     return new Entity(
       this.start, // Start index of the entity
@@ -70,6 +130,11 @@ export class TMTokenBlock implements TMTokens {
     )
   }
 
+  /**
+   * Restore the original state of the token block.
+   * @description This method restores the token block to its original state, including its start, end, tokens, history, label class, current state, and reviewed status.
+   * @returns {void}
+   */
   public restoreOriginalState(): void {
     // Should not need to restore these properties as they are not modified
     // this.start = this.originalState.start
@@ -82,6 +147,14 @@ export class TMTokenBlock implements TMTokens {
   }
 }
 
+/**
+ * Class representing the TokenManager.
+ * @description This class manages tokens and token blocks, allowing for operations such as adding, removing, and updating blocks.
+ * @property {LabelManager} labelManager - The label manager associated with the TokenManager.
+ * @property {TMTokens[]} tokens - An array of tokens or token blocks managed by the TokenManager.
+ * @property {number} edited - A counter for the number of edits made to the tokens.
+ * @property {TMTokenBlock[]} tokenBlocks - An array of TMTokenBlock objects derived from the tokens.
+ */
 export class TokenManager {
   public labelManager: LabelManager
   public tokens: TMTokens[] // Array of TMToken or TMTokenBlock objects
@@ -91,6 +164,13 @@ export class TokenManager {
     return this.tokens.filter((token: TMTokens) => token instanceof TMTokenBlock) as TMTokenBlock[]
   }
 
+  /**
+   * Constructor for TokenManager.
+   * @description The constructor initializes the TokenManager with a LabelManager and an array of tokens.
+   * @param {LabelManager} labelManager - The label manager associated with the TokenManager.
+   * @param {TokenizerSpans[]} tokens - An array of TokenizerSpans objects to initialize the tokens.
+   * @param {Paragraph | null} currentParagraph - The current paragraph
+   */
   constructor(
     labelManager: LabelManager,
     tokens: TokenizerSpans[],
@@ -108,6 +188,13 @@ export class TokenManager {
     }
   }
 
+  /**
+   * Gets all blocks in the specified range.
+   * @description This method retrieves all blocks that overlap with the specified start and end indices.
+   * @param {number} start - The start index of the range.
+   * @param {number} end - The end index of the range.
+   * @returns {TMTokens[]} - An array of TMTokens that overlap with the specified range.
+   */
   public blocksInRange(start: number, end: number): TMTokens[] {
     const blocks: TMTokens[] = []
     for (let i = 0; i < this.tokens.length; i++) {
@@ -123,6 +210,16 @@ export class TokenManager {
     return blocks
   }
 
+  /**
+   * Adds a new block of tokens to the TokenManager.
+   * @description This method adds a new block of tokens, handling overlapping blocks and updating the tokens array accordingly.
+   * @param {number} start - The start index of the new block.
+   * @param {number} end - The end index of the new block.
+   * @param {Label | undefined} labelClass - The label class for the new block, can be undefined.
+   * @param {string} currentState - The current state of the new block.
+   * @param {History[]} [history=[]] - An optional array of history entries for the new block.
+   * @returns {void}
+   */
   public addNewBlock(
     start: number,
     end: number,
@@ -179,6 +276,12 @@ export class TokenManager {
     this.tokens.sort((a, b) => a.start - b.start)
   }
 
+  /**
+   * Adds a block from an Entity or TMTokenBlock structure.
+   * @description This method adds a new block to the TokenManager from an Entity or TMTokenBlock structure.
+   * @param {Entity | TMTokenBlock} entity - The Entity or TMTokenBlock structure to add.
+   * @returns {void}
+   */
   public addBlockFromStructure(entity: Entity | TMTokenBlock): void {
     this.addNewBlock(
       entity.start,
@@ -190,6 +293,13 @@ export class TokenManager {
     this.edited++
   }
 
+  /**
+   * Removes a block of tokens by its start index.
+   * @description This method removes a block of tokens from the TokenManager by its start index.
+   * @param {number} start - The start index of the block to remove.
+   * @param {boolean} [reintroduceTokens=true] - Whether to reintroduce the tokens from the removed block back into the tokens array.
+   * @returns {void}
+   */
   public removeBlock(start: number, reintroduceTokens: boolean = true): void {
     const targetBlock: TMTokens | null = this.getBlockByStart(start)
 
@@ -208,11 +318,22 @@ export class TokenManager {
     }
   }
 
+  /**
+   * Removes duplicate blocks from the tokens array.
+   * @description This method removes duplicate blocks from the tokens array, ensuring that each block is unique.
+   * @returns {void}
+   */
   public removeDuplicateBlocks(): void {
     this.tokens = [...new Set(this.tokens.sort((a, b) => a.start - b.start))]
     this.edited++
   }
 
+  /**
+   * Gets a block by its start index.
+   * @description This method retrieves a block from the tokens array by its start index.
+   * @param {number} start - The start index of the block to retrieve.
+   * @returns {TMTokenBlock | null} - The block if found, otherwise null
+   */
   public getBlockByStart(start: number): TMTokenBlock | null {
     for (let i = 0; i < this.tokens.length; i++) {
       const token: TMTokens = this.tokens[i]
@@ -223,6 +344,13 @@ export class TokenManager {
     return null
   }
 
+  /**
+   * Checks if there are any overlapping blocks in the specified range.
+   * @description This method checks if there are any blocks that overlap with the specified start and end indices.
+   * @param {number} start - The start index of the range.
+   * @param {number} end - The end index of the range.
+   * @returns {TMTokens[] | null} - An array of overlapping blocks if found, otherwise null.
+   */
   public isOverlapping(start: number, end: number): TMTokens[] | null {
     const overlappingBlocks: TMTokens[] = []
 
@@ -242,6 +370,12 @@ export class TokenManager {
     return overlappingBlocks.length > 0 ? overlappingBlocks : null
   }
 
+  /**
+   * Restores the original state of a block by its start index.
+   * @description This method restores the original state of a block by its start index, resetting its properties to their original values.
+   * @param {number} start - The start index of the block to restore.
+   * @returns {void}
+   */
   public restoreOriginalBlockState(start: number): void {
     const targetBlock: TMTokenBlock | null = this.getBlockByStart(start)
 
