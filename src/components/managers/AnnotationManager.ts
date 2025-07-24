@@ -28,30 +28,8 @@
 //   ]
 // }
 import { Label } from './LabelManager'
-type AnnotationManagerExportFormat = {
-  labels: Label[] // Array of labels used in the annotations
-  annotations: ParagraphJSONFormat[] // Array of paragraphs with annotations
-}
-// JSON Export Format Types
-type ParagraphJSONFormat = [
-  id: null | string, // Placeholder for the paragraph ID, can be set later
-  text: string, // The text of the paragraph
-  entitiesObj: {
-    entities: EntityJSONFormat[] // Array of entities in the paragraph
-  },
-]
-type EntityJSONFormat = [
-  id: null | string, // Placeholder for the entity ID, can be set later
-  start: number, // Start index of the entity
-  end: number, // End index of the entity
-  history: HistoryJSONFormat[], // Array of history entries for the entity
-]
-type HistoryJSONFormat = [
-  label: string, // The label of the entity at this point in history
-  state: string, // The state of the entity at this point in history
-  timestamp: string, // The timestamp when this change was made
-  annotator: string, // The name of the annotator who made this change
-]
+import type { REF_AnnotationManagerExportFormat, REF_ParagraphJSONFormat, REF_EntityJSONFormat, REF_HistoryJSONFormat } from '../types/REFFile'
+
 /**
  * Represents the Rich Entity Format File
  * @param {Paragraph[]} annotations - Array of paragraphs with annotations.
@@ -61,15 +39,15 @@ export class AnnotationManager {
   public get inputSentences(): object[] {
     return this.annotations.map((paragraph, i) => ({ id: i, text: paragraph.text }))
   }
-  constructor(annotations: ParagraphJSONFormat[] = []) {
+  constructor(annotations: REF_ParagraphJSONFormat[] = []) {
     this.annotations = annotations.map((paragraph) => Paragraph.fromJSON(paragraph)) // Convert each paragraph to a Paragraph instance
   }
-  public toJSON(newAnnotator: string): ParagraphJSONFormat[] {
+  public toJSON(newAnnotator: string): REF_ParagraphJSONFormat[] {
     return this.annotations.map((paragraph) => paragraph.toJSON(newAnnotator)) // Convert each paragraph to JSON
   }
   public static fromText(text: string): AnnotationManager {
     const transformedText: string[] = text.replace(/(\r\n|\n|\r){2,}/gm, '\n').split('\n')
-    const castedParagraphs: ParagraphJSONFormat[] = transformedText.map((item: string) => {
+    const castedParagraphs: REF_ParagraphJSONFormat[] = transformedText.map((item: string) => {
       return [
         null,
         item,
@@ -81,7 +59,7 @@ export class AnnotationManager {
     return new AnnotationManager(castedParagraphs)
   }
   public static fromJSON(json: string): AnnotationManager {
-    const jsonObject: AnnotationManagerExportFormat = JSON.parse(json)
+    const jsonObject: REF_AnnotationManagerExportFormat = JSON.parse(json)
     return new AnnotationManager(jsonObject.annotations)
   }
 }
@@ -94,7 +72,7 @@ export class Paragraph {
   public text: string
   public entities: Entity[]
   // Export JSON format for the Paragraph class
-  private JSONFormat(newAnnotator: string): ParagraphJSONFormat {
+  private JSONFormat(newAnnotator: string): REF_ParagraphJSONFormat {
     return [
       null, // Placeholder for the paragraph ID, can be set later
       this.text, // The text of the paragraph
@@ -104,7 +82,7 @@ export class Paragraph {
     ]
   }
   // Constructor for the Paragraph class
-  constructor(paragraphText: string, paragraphEntities?: EntityJSONFormat[]) {
+  constructor(paragraphText: string, paragraphEntities?: REF_EntityJSONFormat[]) {
     this.text = paragraphText
     if (paragraphEntities) {
       this.entities = paragraphEntities.length
@@ -118,7 +96,7 @@ export class Paragraph {
    * Converts the Paragraph instance to a JSON object.
    * @returns {object} The JSON representation of the Paragraph.
    */
-  public toJSON(newAnnotator: string): ParagraphJSONFormat {
+  public toJSON(newAnnotator: string): REF_ParagraphJSONFormat {
     return this.JSONFormat(newAnnotator)
   }
   /**
@@ -126,7 +104,7 @@ export class Paragraph {
    * @param {object} json - The JSON object to convert.
    * @returns {Paragraph} The Paragraph instance created from the JSON object.
    */
-  public static fromJSON(json: ParagraphJSONFormat): Paragraph {
+  public static fromJSON(json: REF_ParagraphJSONFormat): Paragraph {
     return new Paragraph(json[1], json[2].entities)
   }
 }
@@ -149,7 +127,7 @@ export class Entity {
     return this.history.length > 0 ? this.history[this.history.length - 1] : null // Get the latest history entry
   }
   // Export JSON format for the Entity class
-  private get JSONFormat(): EntityJSONFormat {
+  private get JSONFormat(): REF_EntityJSONFormat {
     return [
       null, // Placeholder for the entity ID, can be set later
       this.start, // Start index of the entity
@@ -187,7 +165,7 @@ export class Entity {
    * Converts the Entity instance to a JSON object.
    * @returns {JSON} The JSON representation of the Entity.
    */
-  public toJSON(newAnnotator: string): EntityJSONFormat {
+  public toJSON(newAnnotator: string): REF_EntityJSONFormat {
     this.generateHistoryEntryForExport(newAnnotator) // Generate history entry for export
     return this.JSONFormat
   }
@@ -196,7 +174,7 @@ export class Entity {
    * @param {object} json - The JSON object to convert.
    * @returns {Entity} The Entity instance created from the JSON object.
    */
-  public static fromJSON(json: EntityJSONFormat): Entity {
+  public static fromJSON(json: REF_EntityJSONFormat): Entity {
     return new Entity(
       json[1],
       json[2],
@@ -262,7 +240,7 @@ export class History {
   public annotatorName: string // The name of the annotator who made this change
   public timestamp: string // The timestamp when this change was made
   // Export JSON format for the History class
-  private get ArrayFormat(): HistoryJSONFormat {
+  private get ArrayFormat(): REF_HistoryJSONFormat {
     return [
       this.label, // The label of the entity at this point in history
       this.state, // The state of the entity at this point in history
@@ -280,7 +258,7 @@ export class History {
    * Converts the History instance to a JSON object.
    * @returns {Array} The JSON representation of the History.
    */
-  public toJSON(): HistoryJSONFormat {
+  public toJSON(): REF_HistoryJSONFormat {
     return this.ArrayFormat
   }
   /**
@@ -288,7 +266,7 @@ export class History {
    * @param {object} json - The JSON object to convert.
    * @returns {History} The History instance created from the JSON object.
    */
-  public static fromJSON(json: HistoryJSONFormat): History {
+  public static fromJSON(json: REF_HistoryJSONFormat): History {
     return new History(json[0], json[1], json[3], json[2])
   }
   public static formatDate(date: Date): string {

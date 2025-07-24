@@ -1,19 +1,5 @@
-// REF Format
-//   "classes": [
-//     {
-//       "id": CLASS_ID,
-//       "name": "CLASS_NAME",
-//       "color": "CLASS_COLOR"
-//     }
-//   ],
-export type ClassesJSONFormat = {
-  classes: LabelJSONFormat[]
-}
-type LabelJSONFormat = {
-  id: number
-  name: string
-  color: string
-}
+import type { REF_LabelJSONFormat } from "../types/REFFile"
+
 const labelColors = [
   'red-11',
   'blue-11',
@@ -35,6 +21,7 @@ const labelColors = [
   'green-11',
   'orange-11',
 ]
+
 export class Label {
   public id: number
   public name: string
@@ -83,7 +70,7 @@ export class LabelManager {
   public generateRandomColor(): string {
     return labelColors[this.lastId % labelColors.length]
   }
-  public static fromJSON(json: LabelJSONFormat[]): LabelManager {
+  public static fromJSON(json: REF_LabelJSONFormat[]): LabelManager {
     return new LabelManager(json.map((c: Label) => new Label(c.id, c.name, c.color)))
   }
   public setCurrentLabel(name: string): void {
@@ -94,7 +81,7 @@ export class LabelManager {
       throw new Error(`Label with name ${name} does not exist.`)
     }
   }
-  public toJSON(): LabelJSONFormat[] {
+  public toJSON(): REF_LabelJSONFormat[] {
     return this.labels.map((label) => ({
       id: label.id,
       name: label.name,
