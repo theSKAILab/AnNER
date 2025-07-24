@@ -1,39 +1,26 @@
-# AnNER
+## AnNER: Annotation and Named Entity Review Tool
+[![Deployment](https://github.com/theSKAILab/AnNER/actions/workflows/deployment.yml/badge.svg)](https://github.com/theSKAILab/AnNER/actions/workflows/deployment.yml)
 
-This template should help get you started developing with Vue 3 in Vite.
+AnNER is a web-based tool for annotating text with named entities that, beyond basic annotation functionalities, offers a review mode that allows multiple users to review existing annotations and propose corrections or additions. The tool keeps track of the annotation history and exports a semantic representation of the annotation provenance to increase their trustworthiness, which is critical for large-scale knowledge graph construction and other
+downstream tasks.
 
-## Recommended IDE Setup
+This tool was designed and developed in the Spatial Knowledge and Artificial Intelligence (SKAI) lab at University of Maine. This research was supported in part by the U.S. Department of Agriculture through a National Institute of Food and Agriculture (NIFA) grant, Award #2021-67022-34366
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Cite this tool as:
+> Umayer Reza, Nicholas Pease, Torsten Hahmann, and Jinwu Wang. (2025). Annotation and Named Entity Review Tool (AnNER) [Computer software].
 
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
+## Local Development
+To get started with local development, clone the repository and install all required dependencies with
+```bash
 pnpm install
 ```
 
-### Compile and Hot-Reload for Development
-
-```sh
+Once installed, a local development build can be started with
+```bash
 pnpm dev
 ```
 
-### Type-Check, Compile and Minify for Production
-
-```sh
-pnpm build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-pnpm lint
-```
+Other notable build commands include:
+> pnpm build - Build project for production use<br/>
+> pnpm lint - Lint the project using Eslint<br/>
+> pnpm format - Format the project files with project specifications
