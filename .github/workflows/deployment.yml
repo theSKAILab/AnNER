@@ -39,10 +39,34 @@ jobs:
       with:
         name: anner-tool
         path: dist/
+
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.MODIFIED_GITHUB_TOKEN }}
+      - name: Install pnpm and dependencies
+        uses: pnpm/action-setup@v2
+        id: pnpm-install-docs
+        with:
+          version: 8.5.0
+          run_install: false
+      - name: Install
+        run: pnpm install
+      - name: Build Docs
+        run: pnpm typedoc
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: docs/
     
   deploy:
     name: Deploy to GitHub branch
-    needs: build-tool
+    needs: [build-tool, build-docs]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -54,6 +78,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: anner-tool
+      - name: Create docs Directory
+        run: mkdir docs/
+      - name: Download Docs Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docs
+          path: docs/
       - name: Publish
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
