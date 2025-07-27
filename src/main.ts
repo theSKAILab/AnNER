@@ -3,7 +3,6 @@ import { createApp } from 'vue'
 import App from './App.vue'
 
 // Plugin Imports
-import './registerServiceWorker'
 import mitt from 'mitt'
 
 // Store Imports
