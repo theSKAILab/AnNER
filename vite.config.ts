@@ -22,7 +22,7 @@ export default defineConfig({
           enabled: true
         },
       workbox: {
-        navigateFallbackDenylist: [/^\/pr-preview/, /^\/docs/]
+        navigateFallbackDenylist: [/^\/AnNER\/docs/,/^\/AnNER\/docs\//,/^\/AnNER\/pr-preview\//],
       }
     })
   ],

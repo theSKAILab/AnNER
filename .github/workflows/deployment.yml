@@ -86,6 +86,6 @@ jobs:
       - name: Publish
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          commit_message: "Deployment Build"
+          commit_message: Deployment Build - ${{ github.sha }}
           branch: "deployment"
           push_options: '--force'
