@@ -1,0 +1,25 @@
+.page-menu {
+    display: none !important
+}
+
+footer {
+    display: none !important;
+}
+
+body > div.container.container-main > div.col-sidebar > div.site-menu > nav:nth-child(2) > a {
+    display: none !important;
+}
+
+.col-content {
+    width: 100% !important;
+}
+
+.container-main {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) !important;
+    grid-template-areas: "sidebar content" !important;
+}
+
+svg[aria-label="Document"] {
+    display: none !important;
+}
