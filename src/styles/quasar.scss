@@ -54,6 +54,21 @@ body.body--dark {
   width: 200px;
 }
 
+.start-page-container {
+  width: 100%;
+  margin-top: 45px;
+  text-align: center;
+}
+
+.start-page-container > a {
+  margin-left: 10px;
+}
+
+.start-page-container > label {
+  position: relative;
+  display: inline-block;
+}
+
 .q-menu-open-button {
   display: inline-block;
 }

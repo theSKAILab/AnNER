@@ -4,13 +4,14 @@
       <h6 class="text-center text-h3 q-mb-none q-mt-lg text-bold">
         AnNER: Annotation and Named Entity Review Tool
       </h6>
-      <div style="margin-top: 45px">
+      <div class="start-page-container">
         <q-file
           accept=".txt,.json"
           filled
           @update:model-value="this.loadFile"
           label="Open a Text or JSON file to begin"
           :bg-color="$q.dark.isActive ? 'black-1' : 'light-blue-1'"
+          style="width: 40%;"
         >
           <template v-slot:prepend>
             <q-icon name="fas fa-upload" />
@@ -19,6 +20,8 @@
         <p :class="['text-subtitle1 q-my-md', $q.dark.isActive ? 'text-grey-4' : 'text-grey-7']">
           Hint: You can also drag and drop files into this window!
         </p>
+        <q-btn color="primary" icon="img:/AnNER/github-mark-white.svg" label="Github" class="col" href="https://github.com/theSKAILab/AnNER" target="_blank" />
+        <q-btn color="primary" icon="img:/AnNER/document.svg" label="Documentation" class="col" href="https://theskailab.github.io/AnNER/docs/" target="_blank" />
       </div>
       <div class="start-footer">
         This tool was designed and developed in the Spatial Knowledge and Artificial Intelligence
