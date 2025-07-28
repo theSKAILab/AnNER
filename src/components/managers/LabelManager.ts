@@ -1,4 +1,4 @@
-import type { REF_LabelJSONFormat } from "../types/REFFile"
+import type { REF_LabelJSONFormat } from '../types/REFFile'
 
 const labelColors = [
   'red-11',
