@@ -126,10 +126,18 @@
               <q-item
                 clickable
                 v-close-popup
-                href="https://github.com/theSKAILab/AnNER/issues"
+                href="https://github.com/theSKAILab/AnNER"
                 target="_blank"
               >
-                Report Issue
+                GitHub
+              </q-item>
+              <q-item
+                clickable
+                v-close-popup
+                href="https://theskailab.github.io/AnNER/docs/"
+                target="_blank"
+              >
+                Documentation
               </q-item>
               <q-item clickable v-close-popup @click="showAbout = true">
                 <q-item-section>About</q-item-section>
