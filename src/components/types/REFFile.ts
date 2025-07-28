@@ -7,8 +7,8 @@ import type { Label } from '@/components/managers/LabelManager'
  * @property {REF_AnnotationManagerExportFormat} annotations - The annotations associated with the text.
  */
 export type REF_FileFormat = {
-    classes: REF_ClassesJSONFormat,
-    annotations: REF_AnnotationManagerExportFormat,
+  classes: REF_ClassesJSONFormat
+  annotations: REF_AnnotationManagerExportFormat
 }
 
 /**

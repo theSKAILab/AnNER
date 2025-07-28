@@ -1,4 +1,4 @@
-import type { TokenizerSpans } from "@/components/types/Tokenizer"
+import type { TokenizerSpans } from '@/components/types/Tokenizer'
 
 /**
  * Tokenizer Class

@@ -1,5 +1,10 @@
 import { Label } from './LabelManager'
-import type { REF_AnnotationManagerExportFormat, REF_ParagraphJSONFormat, REF_EntityJSONFormat, REF_HistoryJSONFormat } from '../types/REFFile'
+import type {
+  REF_AnnotationManagerExportFormat,
+  REF_ParagraphJSONFormat,
+  REF_EntityJSONFormat,
+  REF_HistoryJSONFormat,
+} from '../types/REFFile'
 
 /**
  * Annotation Manager
@@ -122,7 +127,7 @@ export class Paragraph {
   public toJSON(newAnnotator: string): REF_ParagraphJSONFormat {
     return this.JSONFormat(newAnnotator)
   }
-  
+
   /**
    * Creates a Paragraph instance from a JSON object.
    * @description This method converts a JSON representation of a paragraph back into a Paragraph instance.
@@ -157,7 +162,7 @@ export class Entity {
   public labelClass: Label | undefined // Label class of the entity
   public history: History[] // Array to hold the history of label changes
   public reviewed: boolean // Indicates if the entity has been reviewed
-  public latestEntry = (): History|null => {
+  public latestEntry = (): History | null => {
     return this.history.length > 0 ? this.history[this.history.length - 1] : null // Get the latest history entry
   }
   private get JSONFormat(): REF_EntityJSONFormat {
@@ -218,11 +223,11 @@ export class Entity {
   }
 
   /**
-  * Returns a new instance of Entity from a JSON object.
-  * @description This method converts a JSON representation of an entity back into an Entity instance.
-  * @param {REF_EntityJSONFormat} json - The JSON object to convert.
-  * @returns {Entity} The Entity instance created from the JSON object.
-  */
+   * Returns a new instance of Entity from a JSON object.
+   * @description This method converts a JSON representation of an entity back into an Entity instance.
+   * @param {REF_EntityJSONFormat} json - The JSON object to convert.
+   * @returns {Entity} The Entity instance created from the JSON object.
+   */
   public static fromJSON(json: REF_EntityJSONFormat): Entity {
     return new Entity(
       json[1],
