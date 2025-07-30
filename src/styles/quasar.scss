@@ -44,12 +44,12 @@ body.body--dark {
   border-color: $grey-7;
 }
 
-.q-menu {
+.q-menu.q-position-engine.scroll {
   box-shadow: none;
   border: 1px solid $grey-5;
   border-radius: 0px !important;
-  margin-top: 9px !important;
   margin-left: -5px !important;
+  margin-top: 9px !important;
   padding: 5px;
   width: 200px;
 }
