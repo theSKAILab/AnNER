@@ -10,7 +10,7 @@
           filled
           @update:model-value="this.loadFile"
           label="Open a Text or JSON file to begin"
-          :bg-color="$q.dark.isActive ? 'black-1' : 'light-blue-1'"
+          :bg-color="$q.dark.isActive ? 'black-1' : 'black-1'"
           style="width: 40%"
         >
           <template v-slot:prepend>
