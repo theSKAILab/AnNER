@@ -2,7 +2,7 @@
   <div class="q-mx-auto q-my-xl">
     <div class="column items-center justify-center">
       <h6 class="text-center text-h3 q-mb-none q-mt-lg text-bold">
-        AnNER: Annotation and Named Entity Review Tool
+        AnNER: Named Entity Annotation and Review Tool
       </h6>
       <div class="start-page-container">
         <q-file
