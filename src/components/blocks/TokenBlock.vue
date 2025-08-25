@@ -89,7 +89,7 @@ export default {
       if (this.currentPage === 'review') {
         this.token.currentState = 'Suggested'
       }
-      this.token.labelClass = this.labelManager.selectedLabel
+      this.token.labelClass = this.labelManager.currentLabel
     },
     removeBlock() {
       if (this.currentPage == 'review') {
