@@ -236,7 +236,6 @@ export class TokenManager {
     // This will use the properties of the first returned block
     // to overwrite the properties of the new block
     if (overlappedBlocks) {
-      console.log('Overlapping blocks found:', overlappedBlocks)
       overlappedBlocks.sort((a, b) => a.start - b.start)
 
       if (overlappedBlocks[0] instanceof TMTokenBlock) history = overlappedBlocks[0].history
