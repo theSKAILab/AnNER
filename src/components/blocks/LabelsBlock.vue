@@ -115,6 +115,8 @@ export default {
     saveLabel() {
       if (!this.newClassName) return
 
+      this.newClassName = this.newClassName.toUpperCase().trim()
+
       if (!this.labelManager.doesAlreadyExist(this.newClassName)) {
         this.labelManager.addLabel(this.newClassName)
         this.newClassName = '' // Clear the input field after saving
