@@ -202,6 +202,7 @@ import { mapState, mapMutations } from 'vuex'
 import AboutDialog from '../dialogs/AboutDialog.vue'
 import ExitDialog from '../dialogs/ExitDialog.vue'
 import OpenDialog from '../dialogs/OpenDialog.vue'
+import type { TMTokenBlock } from '../managers/TokenManager'
 
 export default {
   components: { AboutDialog, ExitDialog, OpenDialog },
@@ -235,6 +236,7 @@ export default {
       'labelManager',
       'undoManager',
       'tokenManager',
+      'tokenManagers'
     ]),
     titleBar() {
       return this.$store.state.fileName ? this.$store.state.fileName + ' - ' : ''
@@ -306,6 +308,10 @@ export default {
           persistent: true,
         })
         .onOk((currentAnnotator: string) => {
+          for (let i = 0; i < this.tokenManagers.length; i++) {
+            this.annotationManager.annotations[i].entities = this.tokenManagers[i].tokenBlocks.map((block: TMTokenBlock) => block.exportAsEntity())
+          }
+
           const outputObject: object = {
             classes: this.labelManager.toJSON(),
             annotations: this.annotationManager.toJSON(currentAnnotator),

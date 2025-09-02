@@ -1,7 +1,5 @@
 <script lang="ts">
 import { mapMutations, mapState } from 'vuex'
-import Tokenizer from '../managers/Tokenizer'
-import { TokenManager, TMTokenBlock } from '../managers/TokenManager'
 import Token from '../blocks/Token'
 import TokenBlock from '../blocks/TokenBlock'
 import LabelsBlock from '../blocks/LabelsBlock.vue'
@@ -23,6 +21,7 @@ export default {
       'annotationManager',
       'tokenManager',
       'undoManager',
+      'tokenManagers'
     ]),
     tmEdited() {
       if (this.tokenManager) {
@@ -35,13 +34,11 @@ export default {
     tmEdited: {
       handler() {
         this.tokenizeCurrentSentence()
-        this.save()
       },
       deep: true,
     },
     currentIndex() {
       this.tokenizeCurrentSentence()
-      this.save()
     },
   },
   methods: {
@@ -57,13 +54,7 @@ export default {
      * Tokenizes the current sentence and sets the TokenManager
      */
     tokenizeCurrentSentence() {
-      this.setTokenManager(
-        new TokenManager(
-          this.labelManager,
-          Tokenizer.span_tokenize(this.annotationManager.inputSentences[this.currentIndex].text),
-          this.annotationManager.annotations[this.currentIndex],
-        ),
-      )
+      this.setTokenManager(this.tokenManagers[this.currentIndex] || null)
     },
     /**
      * Adds a new block to the TokenManager based on the current selection
@@ -138,7 +129,6 @@ export default {
       }
 
       selection?.empty()
-      this.save()
     },
     // Callbacks for Token and TokenBlock components
     /**
@@ -148,14 +138,6 @@ export default {
     onRemoveBlock(blockStart: number) {
       this.undoManager.addDeleteUndo(this.tokenManager.getBlockByStart(blockStart))
       this.tokenManager.removeBlock(blockStart)
-      this.save()
-    },
-    /**
-     * Saves the current annotation to the store
-     */
-    save() {
-      this.annotationManager.annotations[this.currentIndex].entities =
-        this.tokenManager.tokenBlocks.map((block: TMTokenBlock) => block.exportAsEntity())
     },
     beforeLeave() {
       return 'Leaving this page will discard any unsaved changes.'

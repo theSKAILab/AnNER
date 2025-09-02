@@ -1,4 +1,4 @@
-import type TokenManager from '@/components/managers/TokenManager.ts'
+import { TokenManager } from '@/components/managers/TokenManager.ts'
 import { AnnotationManager } from '@/components/managers/AnnotationManager.ts'
 import { LabelManager } from '@/components/managers/LabelManager.ts'
 import { UndoManager } from '@/components/managers/UndoManager.ts'
@@ -6,6 +6,7 @@ import { UndoManager } from '@/components/managers/UndoManager.ts'
 import { createStore, Store } from 'vuex'
 import type { InjectionKey } from 'vue'
 import type { REF_ClassesJSONFormat } from '../types/REFFile'
+import Tokenizer from './Tokenizer'
 
 const mutations = {
   /**
@@ -49,6 +50,17 @@ const mutations = {
       state.annotationManager = AnnotationManager.fromText(payload)
       state.labelManager = new LabelManager()
     }
+
+    // Setup TokenManagers for each sentence
+    for (let i = 0; i < state.annotationManager.inputSentences.length; i++) {
+      state.tokenManagers?.push(new TokenManager(
+        state.labelManager as LabelManager,
+        Tokenizer.span_tokenize(state.annotationManager.inputSentences[i].text),
+        state.annotationManager?.annotations[i]
+      ))
+    }
+
+    state.currentIndex = 0
   },
 
   /**
@@ -106,6 +118,7 @@ interface State {
   labelManager: LabelManager | null // Global label manager,
   tokenManager: TokenManager | null // Global token manager,
   undoManager: UndoManager | null // Global undo manager
+  tokenManagers: TokenManager[] | null // Array of token managers for each sentence
 }
 
 export const store = createStore<State>({
@@ -118,6 +131,7 @@ export const store = createStore<State>({
       labelManager: null, // Global label manager,
       tokenManager: null, // Global token manager,
       undoManager: null, // Global undo manager
+      tokenManagers: [], // Array of token managers for each sentence
     }
   },
   mutations,
