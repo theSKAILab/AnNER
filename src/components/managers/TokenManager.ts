@@ -115,8 +115,7 @@ export class TMTokenBlock implements TMTokens {
   }
 
   /**
-   * Static method to create a TMTokenBlock from an Entity object.
-   * @param {Entity} entity - The Entity object to convert.
+   * Method to create a TMTokenBlock from an Entity object.
    * @returns {TMTokenBlock} - A new TMTokenBlock instance.
    */
   public exportAsEntity(): Entity {
