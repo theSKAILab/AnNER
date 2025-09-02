@@ -22,7 +22,7 @@
         size="xs"
         text-color="grey-7"
         title="Change label to currently selected label"
-        @click="changeClass"
+        @click="changeLabel"
       />
       <!-- Delete label button (X) -->
       <q-btn
@@ -83,7 +83,7 @@ export default {
       this.token.currentState = nextState
       this.token.reviewed = true
     },
-    changeClass() {
+    changeLabel() {
       this.undoManager.addUpdateUndo({ ...this.token })
       this.token.reviewed = true
       if (this.currentPage === 'review') {
