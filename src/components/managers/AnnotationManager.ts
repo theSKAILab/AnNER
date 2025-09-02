@@ -6,6 +6,11 @@ import type {
   REF_HistoryJSONFormat,
 } from '../types/REFFile'
 
+export interface AnnotationManagerInputSentence {
+  id: number
+  text: string
+}
+
 /**
  * Annotation Manager
  * @description This class manages annotations imported from a text or JSON file in the Rich Entity Format (REF).
@@ -18,9 +23,9 @@ export class AnnotationManager {
   /**
    * Get all input sentences from the annotations.
    * @description This method extracts input sentences from the annotations, where each sentence is represented as an object with an ID and text.
-   * @returns {object[]} An array of objects containing the ID and text of each input sentence.
+   * @returns {AnnotationManagerInputSentence[]} An array of objects containing the ID and text of each input sentence.
    */
-  public get inputSentences(): object[] {
+  public get inputSentences(): AnnotationManagerInputSentence[] {
     return this.annotations.map((paragraph, i) => ({ id: i, text: paragraph.text }))
   }
 
