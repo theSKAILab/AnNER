@@ -25,12 +25,23 @@
               <q-item
                 clickable
                 v-close-popup
-                @click="this.export()"
+                @click="this.save()"
                 :class="$store.state.currentPage == 'start' ? 'disabled' : ''"
               >
                 <q-item-section>
                   <span>Save</span>
                   <span class="keyboard-tip">Ctrl + S</span>
+                </q-item-section>
+              </q-item>
+              <q-item
+                clickable
+                v-close-popup
+                @click="this.export()"
+                :class="$store.state.currentPage == 'start' ? 'disabled' : ''"
+              >
+                <q-item-section>
+                  <span>Export as RDF</span>
+                  <span class="keyboard-tip">Ctrl + D</span>
                 </q-item-section>
               </q-item>
               <q-item
@@ -203,6 +214,8 @@ import AboutDialog from '../dialogs/AboutDialog.vue'
 import ExitDialog from '../dialogs/ExitDialog.vue'
 import OpenDialog from '../dialogs/OpenDialog.vue'
 import type { TMTokenBlock } from '../managers/TokenManager'
+import type { REF_FileFormat } from '../types/REFFile'
+import { RDFManager } from '../managers/RDFManager'
 
 export default {
   components: { AboutDialog, ExitDialog, OpenDialog },
@@ -269,6 +282,9 @@ export default {
         this.$refs.file.click()
       }
       if (e.key == 's' && e.ctrlKey && isValid) {
+        this.save()
+      }
+      if (e.key == 'd' && e.ctrlKey && isValid) {
         this.export()
       }
       if (e.key == 'q' && e.ctrlKey && isValid) {
@@ -294,7 +310,7 @@ export default {
       window.onbeforeunload = null // Disable the beforeunload event
       window.location.reload()
     },
-    export() {
+    save() {
       this.$q
         .dialog({
           title: 'Save File',
@@ -312,7 +328,7 @@ export default {
             this.annotationManager.annotations[i].entities = this.tokenManagers[i].tokenBlocks.map((block: TMTokenBlock) => block.exportAsEntity())
           }
 
-          const outputObject: object = {
+          const outputObject: REF_FileFormat = {
             classes: this.labelManager.toJSON(),
             annotations: this.annotationManager.toJSON(currentAnnotator),
           }
@@ -329,6 +345,38 @@ export default {
           document.body.removeChild(element)
         })
     },
+    export() {
+      this.$q
+        .dialog({
+          title: 'Export File as RDF',
+          message: 'Please enter a name for the exported annotations file',
+          prompt: {
+            model: '',
+            type: 'text',
+            isValid: (val) => val.length > 0,
+          },
+          cancel: true,
+          persistent: true,
+        })
+        .onOk((filename: string) => {
+          for (let i = 0; i < this.tokenManagers.length; i++) {
+            this.annotationManager.annotations[i].entities = this.tokenManagers[i].tokenBlocks.map((block: TMTokenBlock) => block.exportAsEntity())
+          }
+
+          const outputRDF = new RDFManager(this.annotationManager, this.labelManager).export();
+          
+          const element = document.createElement('a')
+          element.setAttribute(
+            'href',
+            'data:text/plain;charset=utf-8,' + encodeURIComponent(outputRDF),
+          )
+          element.setAttribute('download', `${filename}.rdf`)
+          element.style.display = 'none'
+          document.body.appendChild(element)
+          element.click()
+          document.body.removeChild(element)
+        })
+    }
   },
 }
 </script>
