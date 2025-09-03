@@ -110,6 +110,16 @@ export class LabelManager {
   }
 
   /**
+   * Returns the ID of a label given its name.
+   * @param name Name of the label
+   * @returns {number | null} ID of the label, or null if not found
+   */
+  public getLabelId(name: string): number | null {
+    const label = this.getLabelByName(name)
+    return label ? label.id : null
+  }
+
+  /**
    * Gets a label by its name.
    * @description This method retrieves a label with the specified name from the manager.
    * @param {string} name - The name of the label to retrieve.

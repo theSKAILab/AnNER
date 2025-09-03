@@ -15,7 +15,7 @@ export interface AnnotationManagerInputSentence {
  * Annotation Manager
  * @description This class manages annotations imported from a text or JSON file in the Rich Entity Format (REF).
  * @property {Paragraph[]} annotations - An array of paragraphs with annotations.
- * @property {object[]} inputSentences - An array of objects containing the ID and text of each input sentence.
+ * @property {AnnotationManagerInputSentence[]} inputSentences - An array of objects containing the ID and text of each input sentence.
  */
 export class AnnotationManager {
   public annotations: Paragraph[]
@@ -85,10 +85,12 @@ export class AnnotationManager {
  * @description This class represents a paragraph in the annotations, containing text and entities.
  * @property {string} text - The text of the paragraph.
  * @property {Entity[]} entities - An array of entities in the paragraph.
+ * @property {string | null} id - The ID of the paragraph.
  */
 export class Paragraph {
   public text: string
   public entities: Entity[]
+  public id: string | null = null;
 
   /**
    * Exports the paragraph to a JSON format.
@@ -98,7 +100,7 @@ export class Paragraph {
    */
   private JSONFormat(newAnnotator: string): REF_ParagraphJSONFormat {
     return [
-      null, // Placeholder for the paragraph ID, can be set later
+      this.id,
       this.text, // The text of the paragraph
       {
         entities: this.entities.map((entity) => entity.toJSON(newAnnotator)), // Convert each entity to JSON
@@ -157,6 +159,7 @@ export class Paragraph {
  * @property {boolean} reviewed - Indicates if the entity has been reviewed.
  * @property {History|null} latestEntry - A method to get the latest history entry.
  * @property {REF_EntityJSONFormat} JSONFormat - A method to export the entity to a JSON format.
+ * @property {string | null} id - The ID of the entity.
  */
 export class Entity {
   public start: number // Start index of the entity
@@ -167,12 +170,13 @@ export class Entity {
   public labelClass: Label | undefined // Label class of the entity
   public history: History[] // Array to hold the history of label changes
   public reviewed: boolean // Indicates if the entity has been reviewed
+  public id: string | null = null; // ID of the entity
   public latestEntry = (): History | null => {
     return this.history.length > 0 ? this.history[this.history.length - 1] : null // Get the latest history entry
   }
   private get JSONFormat(): REF_EntityJSONFormat {
     return [
-      null, // Placeholder for the entity ID, can be set later
+      this.id, // Placeholder for the entity ID, can be set later
       this.start, // Start index of the entity
       this.end, // End index of the entity
       this.history.map((historyEntry) => historyEntry.toJSON()),

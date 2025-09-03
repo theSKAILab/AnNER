@@ -1,0 +1,128 @@
+{
+  "classes": [
+    {
+      "id": 1,
+      "name": "A",
+      "color": "red-11"
+    },
+    {
+      "id": 2,
+      "name": "V",
+      "color": "blue-11"
+    },
+    {
+      "id": 3,
+      "name": "C",
+      "color": "light-green-11"
+    }
+  ],
+  "annotations": [
+    [
+      null,
+      "In today's world, the demand for energy is ever-increasing, and the environmental impact of traditional energy sources is becoming more evident. Renewable energy, derived from natural sources such as sunlight, wind, and water, offers a sustainable solution to meet our energy needs while minimizing environmental harm. This essay will explore the importance of renewable energy, its benefits, and the challenges associated with its implementation.",
+      {
+        "entities": [
+          [
+            null,
+            22,
+            28,
+            [
+              [
+                "A",
+                "Candidate",
+                "2025-08-24T21:12:50Z",
+                "test"
+              ],
+              [
+                "A",
+                "Accepted",
+                "2025-09-02T15:46:15Z",
+                "test1"
+              ]
+            ]
+          ],
+          [
+            null,
+            111,
+            116,
+            [
+              [
+                "V",
+                "Candidate",
+                "2025-08-24T21:12:50Z",
+                "test"
+              ]
+            ]
+          ],
+          [
+            null,
+            192,
+            199,
+            [
+              [
+                "A",
+                "Candidate",
+                "2025-08-24T21:12:50Z",
+                "test"
+              ]
+            ]
+          ],
+          [
+            null,
+            236,
+            247,
+            [
+              [
+                "V",
+                "Candidate",
+                "2025-08-24T21:12:50Z",
+                "test"
+              ]
+            ]
+          ],
+          [
+            null,
+            347,
+            357,
+            [
+              [
+                "A",
+                "Candidate",
+                "2025-08-24T21:12:50Z",
+                "test"
+              ]
+            ]
+          ]
+        ]
+      }
+    ],
+    [
+      null,
+      "One of the most significant advantages of renewable energy is its positive impact on the environment. Unlike fossil fuels, renewable energy sources produce little to no greenhouse gases, which are the primary contributors to global warming and climate change. By reducing our reliance on coal, oil, and natural gas, we can decrease air pollution, protect ecosystems, and mitigate the effects of climate change. For instance, solar panels and wind turbines generate electricity without emitting harmful pollutants, making them cleaner alternatives to traditional power plants. Additionally, renewable energy sources are often abundant and naturally replenished, ensuring a continuous supply without depleting the Earth's resources. This sustainable approach helps preserve natural habitats and biodiversity, contributing to a healthier planet for future generations.",
+      {
+        "entities": []
+      }
+    ],
+    [
+      null,
+      "Renewable energy also offers substantial economic benefits. Investing in renewable energy infrastructure can create jobs, stimulate economic growth, and reduce energy costs in the long run. As technology advances, the cost of renewable energy systems continues to decline, making them more accessible and affordable for consumers and businesses alike. Additionally, renewable energy can enhance energy security by reducing dependence on imported fuels, which are subject to price volatility and geopolitical tensions. Countries that prioritize renewable energy development can achieve greater energy independence and stability. Moreover, the renewable energy sector has the potential to drive innovation and technological advancements, fostering a competitive market that benefits both producers and consumers. By embracing renewable energy, nations can position themselves as leaders in the global transition towards sustainable energy solutions.",
+      {
+        "entities": []
+      }
+    ],
+    [
+      null,
+      "The transition to renewable energy has the potential to improve public health and quality of life. Traditional energy sources, such as coal and oil, are associated with air and water pollution, which can lead to respiratory illnesses, cardiovascular diseases, and other health problems. By adopting cleaner energy alternatives, we can reduce the incidence of these health issues and create healthier communities. Furthermore, renewable energy projects often involve local communities, fostering collaboration and promoting social equity. Access to clean energy can empower marginalized populations and contribute to poverty alleviation. The decentralized nature of many renewable energy systems, such as solar panels and wind turbines, allows for greater energy access in remote and underserved areas, improving living standards and economic opportunities for those communities. This inclusive approach ensures that the benefits of renewable energy are shared widely, promoting social justice and environmental sustainability.",
+      {
+        "entities": []
+      }
+    ],
+    [
+      null,
+      "In conclusion, renewable energy is crucial for addressing the environmental, economic, and social challenges of our time. Its benefits extend beyond reducing greenhouse gas emissions to include economic growth, job creation, and improved public health. While there are challenges to overcome, such as initial investment costs and technological barriers, the long-term advantages of renewable energy make it a vital component of a sustainable future. Embracing renewable energy is not only a necessity but also an opportunity to build a cleaner, healthier, and more equitable world. By prioritizing renewable energy development and fostering innovation, we can pave the way for a sustainable energy landscape that benefits both people and the planet.",
+      {
+        "entities": []
+      }
+    ]
+  ]
+}
