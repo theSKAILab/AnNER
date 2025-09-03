@@ -262,7 +262,7 @@ export class TokenManager {
     this.tokens.push(
       new TMTokenBlock(
         selectionStart,
-        selectionEnd,
+        targetedBlocks[targetedBlocks.length - 1].end,
         targetedBlocks as TMToken[],
         labelClass as Label,
         currentState,
