@@ -1,10 +1,11 @@
 <template>
   <q-header bordered>
+    <div class="draggable-region"></div>
     <div class="q-pa-sm q-pl-md row items-center">
       <!-- Menu Options -->
       <span class="col">
         <!-- File -->
-        <div class="cursor-pointer non-selectable">
+        <div class="cursor-pointer non-selectable no-app-region">
           <span class="q-menu-open-button" ref="fileMenu"> File </span>
           <q-menu transition-show="jump-down" transition-hide="jump-up">
             <q-list dense style="min-width: 100px">
@@ -73,7 +74,7 @@
         />
 
         <!-- Edit -->
-        <div class="q-ml-md cursor-pointer non-selectable">
+        <div class="q-ml-md cursor-pointer non-selectable no-app-region">
           <span class="q-menu-open-button" ref="editMenu"> Edit </span>
           <q-menu transition-show="jump-down" transition-hide="jump-up">
             <q-list dense style="min-width: 100px">
@@ -104,7 +105,7 @@
         </div>
 
         <!-- Annotator -->
-        <div class="q-ml-md cursor-pointer non-selectable">
+        <div class="q-ml-md cursor-pointer non-selectable no-app-region">
           <span class="q-menu-open-button" ref="annotatorMenu"> Annotator </span>
           <q-menu transition-show="jump-down" transition-hide="jump-up">
             <q-list dense style="min-width: 100px">
@@ -130,7 +131,7 @@
         </div>
 
         <!-- Help -->
-        <div class="q-ml-md cursor-pointer non-selectable" ref="helpMenu">
+        <div class="q-ml-md cursor-pointer non-selectable no-app-region" ref="helpMenu">
           <span class="q-menu-open-button">Help</span>
           <q-menu transition-show="jump-down" transition-hide="jump-up">
             <q-list dense style="min-width: 100px">
