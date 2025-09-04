@@ -216,7 +216,6 @@ import ExitDialog from '../dialogs/ExitDialog.vue'
 import OpenDialog from '../dialogs/OpenDialog.vue'
 import type { TMTokenBlock } from '../managers/TokenManager'
 import type { REF_FileFormat } from '../types/REFFile'
-import { RDFManager } from '../managers/RDFManager'
 
 export default {
   components: { AboutDialog, ExitDialog, OpenDialog },
@@ -364,7 +363,7 @@ export default {
             this.annotationManager.annotations[i].entities = this.tokenManagers[i].tokenBlocks.map((block: TMTokenBlock) => block.exportAsEntity())
           }
 
-          const outputRDF = new RDFManager(this.annotationManager, this.labelManager).export();
+          const outputRDF = this.annotationManager.toRDF(this.labelManager);
           
           const element = document.createElement('a')
           element.setAttribute(

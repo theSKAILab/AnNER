@@ -1,4 +1,4 @@
-import { Label } from './LabelManager'
+import { Label, LabelManager } from './LabelManager'
 import type {
   REF_AnnotationManagerExportFormat,
   REF_ParagraphJSONFormat,
@@ -49,6 +49,34 @@ export class AnnotationManager {
   }
 
   /**
+   * Converts the AnnotationManager instance to RDF format.
+   * @param labelManager - Instance of LabelManager to include labels in the RDF export
+   * @returns {string} RDF representation of the annotations
+   */
+  public toRDF(labelManager: LabelManager): string {
+    const rdfDocumentId: string = `AnNER-RDF_${new Date().toISOString().replace(/[-:T.]/g, '').substring(2, 14)}`;
+    
+    this.generateIDsForExport(rdfDocumentId); // Ensure all paragraphs and entities have IDs
+    const paragraphIds: string[] = this.annotations.map((paragraph) => `data:${paragraph.id}`);
+    
+    let rdfDocument: string = '';
+
+    rdfDocument += this.rdfHeader(rdfDocumentId); // Add header to RDF data
+
+    rdfDocument += `onner:directlyContainsDocumentPart ${paragraphIds.join(', ')} .\n\n`
+
+    this.annotations.forEach((paragraph, i) => rdfDocument += paragraph.toRDF(i, rdfDocumentId, paragraphIds, labelManager));
+
+    rdfDocument += `data:${rdfDocumentId}_EndOfDocument rdf:type onner:EndOfDocument .\n`
+
+    rdfDocument += labelManager.toRDF(); // Add labels to RDF data
+
+    rdfDocument += this.rdfFooter(); // Add footer to RDF data
+
+    return rdfDocument;
+  }
+
+  /**
    * Returns new instance of AnnotationManager from a text file.
    * @description This method processes a text file, splitting it into paragraphs based on double newlines, and creates a new AnnotationManager instance.
    * @param {string} text - The text content of the file.
@@ -77,6 +105,54 @@ export class AnnotationManager {
   public static fromJSON(json: string): AnnotationManager {
     const jsonObject: REF_AnnotationManagerExportFormat = JSON.parse(json)
     return new AnnotationManager(jsonObject.annotations)
+  }
+
+  // RDF Export Builder Functions
+
+  /**
+   * Exports the RDF header with prefixes and publication metadata.
+   * @param documentId - Unique identifier for the document
+   * @returns {string} RDF header string with prefixes and publication metadata
+   */
+  private rdfHeader(documentId: string): string {
+    let rdfData: string = '';
+    rdfData += '@prefix onner: <http://purl.org/spatialai/onner/onner-full#> .\n';
+    rdfData += '@prefix data: <http://purl.org/spatialai/onner/onner-full/data#> .\n';
+    rdfData += '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n';
+    rdfData += '@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n';
+    rdfData += '@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n';
+    rdfData += '@prefix owl: <http://www.w3.org/2002/07/owl#> .\n\n';
+    rdfData += `data:Publication_${documentId} rdf:type onner:ScholarlyPublication ;\n`;
+    rdfData += `onner:publicationTitle 'any title??'^^xsd:string ;\n`;
+    rdfData += `onner:publicationDate 'current date??'^^xsd:date ;\n`;
+    rdfData += `onner:doi 'No DOI??'^^xsd:string ;\n`;
+    return rdfData;
+  }
+
+  /**
+   * Exports the RDF footer with labeling schema and NER system metadata.
+   * @returns {string} RDF footer string with labeling schema and NER system metadata
+   */
+  private rdfFooter(): string {
+    let rdfData: string = '';
+    rdfData += `data:Labeling_Schema rdf:type onner:LabelingSchema ;\n`;
+    rdfData += `onner:schemaName 'CelloGraph'^^xsd:string .\n\n`;
+    rdfData += `data:Cellulosic_NER_Model rdf:type onner:NER_System ;\n`;    // if/else required to identify system and human
+    rdfData += `onner:systemVersion '1.0'^^xsd:string .\n\n`;
+    return rdfData;
+  }
+
+  /**
+   * Generates unique IDs for paragraphs and entities if they are missing.
+   * @param rdfDocumentId - Unique identifier for the document
+   */
+  private generateIDsForExport(rdfDocumentId: string): void {
+    this.annotations.forEach((paragraph, i) => {
+      if (!paragraph.id) paragraph.id = `${rdfDocumentId}_p${i}`;
+      paragraph.entities.forEach((entity, j) => {
+        if (!entity.id) entity.id = `${paragraph.id}_e${j}`;
+      });
+    });
   }
 }
 
@@ -133,6 +209,34 @@ export class Paragraph {
    */
   public toJSON(newAnnotator: string): REF_ParagraphJSONFormat {
     return this.JSONFormat(newAnnotator)
+  }
+
+  /**
+   * Generates the RDF representation of the paragraph.
+   * @param {number} paragraphNumber position of the paragraph in the document
+   * @param {string} documentId unique identifier for the document
+   * @param {string[]} paragraphIds array of paragraph IDs
+   * @param {LabelManager} labelManager instance of LabelManager to include labels in the RDF export
+   * @returns {string} RDF representation of the paragraph
+   */
+  public toRDF(paragraphNumber: number, documentId: string, paragraphIds: string[], labelManager: LabelManager): string {
+    let rdfData: string = '';
+
+    rdfData += `data:${this.id} rdf:type onner:Paragraph ;\n`
+    rdfData += `onner:positionInParentDocumentPart '${paragraphNumber}'^^xsd:nonNegativeInteger ;\n`
+    rdfData +=
+      paragraphNumber < paragraphIds.length
+        ? `onner:nextDocumentPart ${this.id} ;\n`
+        : `onner:nextDocumentPart data:${documentId}_EndOfDocument ;\n`
+    rdfData += `onner:paragraphText '${this.text}'^^xsd:string ;\n`
+
+    if (this.entities.length > 0) {
+      rdfData += this.entities.map((entity) => entity.toRDF(this, labelManager)).join("");
+    } else {
+      rdfData += `onner:directlyContainsLabeledTerm data:NoLabeledTerm .\n\n`
+    }
+
+    return rdfData;
   }
 
   /**
@@ -229,6 +333,29 @@ export class Entity {
   public toJSON(newAnnotator: string): REF_EntityJSONFormat {
     this.generateHistoryEntryForExport(newAnnotator) // Generate history entry for export
     return this.JSONFormat
+  }
+
+  /**
+   * Generates the RDF representation of the entity.
+   * @param {Paragraph} paragraph The paragraph containing the entity.
+   * @param {LabelManager} labelManager The label manager instance.
+   * @returns {string} The RDF representation of the entity.
+   */
+  public toRDF(paragraph: Paragraph, labelManager: LabelManager): string {
+    let rdfData: string = '';
+
+    rdfData += `data:${this.id} rdf:type onner:LabeledTerm ;\n` // deal with atomic and compound terms
+    rdfData += `onner:labeledTermText '${paragraph.text.substring(this.start, this.end)}'^^xsd:string ;\n`
+    rdfData += `onner:offset '${this.start}'^^xsd:nonNegativeInteger ;\n`
+    rdfData += `onner:length '${this.end - this.start}'^^xsd:nonNegativeInteger ;\n`
+    rdfData += `onner:labeledTermDirectlyContainedBy data:${paragraph.id} ;\n`
+    rdfData += `onner:hasLabeledTermStatus ${this.history.map((historyEntry) => `data:${historyEntry.state}_${this.id}`).join(',')} .\n\n`
+
+    this.generateHistoryEntryForExport("RDF Export"); // Ensure history is up to date for RDF export
+
+    rdfData += this.history.map((historyEntry) => historyEntry.toRDF(this, labelManager)).join("");
+
+    return rdfData;
   }
 
   /**
@@ -352,6 +479,23 @@ export class History {
    */
   public toJSON(): REF_HistoryJSONFormat {
     return this.ArrayFormat
+  }
+
+  /**
+   * Generates the RDF representation of the entity.
+   * @param {Entity} entity The entity to convert to RDF.
+   * @param {LabelManager} labelManager The label manager instance.
+   * @returns {string} The RDF representation of the entity.
+   */
+  public toRDF(entity: Entity, labelManager: LabelManager): string {
+    let rdfData: string = '';
+
+    rdfData += `data:Candidate_${entity.id} rdf:type onner:CandidateStatus ;\n`
+    rdfData += `onner:statusAssignmentDate '${this.timestamp}'^^xsd:dateTime ;\n`
+    rdfData += `onner:statusAssignedBy '${this.annotatorName}'^^xsd:string ;\n`
+    rdfData += `onner:hasLabeledTermLabel data:Label_${labelManager.getLabelId(this.label) ?? 0 + 1} .\n\n`
+
+    return rdfData;
   }
 
   /**

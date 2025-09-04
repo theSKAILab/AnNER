@@ -39,6 +39,16 @@ export class Label {
     this.name = name
     this.color = color
   }
+
+  public toRDF(): string {
+    let rdfData: string = ''
+
+    rdfData += `data:Label_${this.id} rdf:type onner:Label ;\n`;
+    rdfData += `onner:fromLabelingSchema data:Labeling_Schema ;\n`;
+    rdfData += `onner:labelText '${this.name}'^^xsd:string .\n\n`;
+
+    return rdfData;
+  }
 }
 
 /**
@@ -145,7 +155,7 @@ export class LabelManager {
    * @returns {LabelManager} The LabelManager instance created from the JSON object.
    */
   public static fromJSON(json: REF_LabelJSONFormat[]): LabelManager {
-    return new LabelManager(json.map((c: Label) => new Label(c.id, c.name, c.color)))
+    return new LabelManager(json.map((c: REF_LabelJSONFormat) => new Label(c.id, c.name, c.color)))
   }
 
   /**
@@ -173,5 +183,13 @@ export class LabelManager {
       name: label.name,
       color: label.color,
     }))
+  }
+
+  public toRDF(): string {
+    let rdfData: string = ''
+
+    this.labels.forEach((label) => rdfData += label.toRDF());
+
+    return rdfData;
   }
 }
