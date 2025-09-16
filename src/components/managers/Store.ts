@@ -74,6 +74,7 @@ const mutations = {
       state.currentIndex < state.annotationManager.inputSentences.length - 1
     ) {
       state.currentIndex += 1
+      state.undoManager = new UndoManager()
     }
   },
 
@@ -85,6 +86,7 @@ const mutations = {
   previousSentence(state: State): void {
     if (state.currentIndex > 0) {
       state.currentIndex -= 1
+      state.undoManager = new UndoManager()
     }
   },
 
@@ -106,7 +108,6 @@ const mutations = {
    */
   setTokenManager(state: State, tokenManager: TokenManager): void {
     state.tokenManager = tokenManager
-    state.undoManager = new UndoManager()
   },
 }
 
@@ -130,7 +131,7 @@ export const store = createStore<State>({
       annotationManager: null, // Global annotation manager
       labelManager: null, // Global label manager,
       tokenManager: null, // Global token manager,
-      undoManager: null, // Global undo manager
+      undoManager: new UndoManager(), // Global undo manager
       tokenManagers: [], // Array of token managers for each sentence
     }
   },
