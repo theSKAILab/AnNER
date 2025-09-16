@@ -395,8 +395,8 @@ export class Entity {
    */
   private generateHistoryEntryForExport(newAnnotator: string): void {
     const newHistoryEntry = new History(
-      this.labelName || '', // Use the label name or an empty string if not set
       this.currentState || 'Candidate', // Use the current state or default to 'Candidate'
+      this.labelName || '', // Use the label name or an empty string if not set
       newAnnotator, // The name of the annotator making the change
       History.formatDate(new Date()),
     )
@@ -408,8 +408,8 @@ export class Entity {
     ) {
       this.history.push(
         new History(
-          this.latestEntry()?.label || '',
           this.latestEntry()?.state || '',
+          this.latestEntry()?.label || '',
           newAnnotator,
           History.formatDate(new Date()),
         ),
@@ -449,8 +449,8 @@ export class History {
    */
   private get ArrayFormat(): REF_HistoryJSONFormat {
     return [
-      this.label, // The label of the entity at this point in history
       this.state, // The state of the entity at this point in history
+      this.label, // The label of the entity at this point in history
       this.timestamp, // The timestamp when this change was made
       this.annotatorName, // The name of the annotator who made this change
     ]
@@ -460,14 +460,14 @@ export class History {
    * Constructor for the History class.
    * @constructor
    * @description This constructor initializes the History with label, state, annotator name, and timestamp.
-   * @param {string} label - The label of the entity at this point in history.
    * @param {string} state - The state of the entity at this point in history.
+   * @param {string} label - The label of the entity at this point in history.
    * @param {string} annotatorName - The name of the annotator who made this change.
    * @param {string} timestamp - The timestamp when this change was made.
    */
-  constructor(label: string, state: string, annotatorName: string, timestamp: string) {
-    this.label = label
+  constructor(state: string, label: string, annotatorName: string, timestamp: string) {
     this.state = state
+    this.label = label
     this.annotatorName = annotatorName
     this.timestamp = timestamp
   }

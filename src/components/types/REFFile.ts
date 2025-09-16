@@ -77,14 +77,14 @@ export type REF_EntityJSONFormat = [
 /**
  * Rich Entity Format (REF) History JSON Format
  * @description This format defines the structure for the history of changes made to an entity.
- * @property {string} label - The label of the entity at this point in history.
  * @property {string} state - The state of the entity at this point in history.
+ * @property {string} label - The label of the entity at this point in history.
  * @property {string} timestamp - The timestamp when this change was made.
  * @property {string} annotator - The name of the annotator who made this change
  */
 export type REF_HistoryJSONFormat = [
-  label: string,
   state: string,
+  label: string,
   timestamp: string,
   annotator: string,
 ]
