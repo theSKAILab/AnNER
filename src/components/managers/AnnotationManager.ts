@@ -396,7 +396,7 @@ export class Entity {
   private generateHistoryEntryForExport(newAnnotator: string): void {
     const newHistoryEntry = new History(
       this.currentState || 'Candidate', // Use the current state or default to 'Candidate'
-      this.labelName || '', // Use the label name or an empty string if not set
+      this.labelClass.name || '', // Use the label name or an empty string if not set
       newAnnotator, // The name of the annotator making the change
       History.formatDate(new Date()),
     )
@@ -404,8 +404,9 @@ export class Entity {
       this.reviewed &&
       this.latestEntry()?.annotatorName != newAnnotator &&
       this.latestEntry()?.state == this.currentState &&
-      this.latestEntry()?.label == this.labelName
+      this.latestEntry()?.label == this.labelClass.name
     ) {
+      console.log(this.latestEntry()?.label, this.labelClass)
       this.history.push(
         new History(
           this.latestEntry()?.state || '',
@@ -421,7 +422,7 @@ export class Entity {
       this.history.push(newHistoryEntry) // If the entity is in 'Candidate' or 'Suggested' state and has no history, add the new history entry
     } else if (
       this.latestEntry()?.state != this.currentState ||
-      this.latestEntry()?.label != this.labelName
+      this.latestEntry()?.label != this.labelClass.name
     ) {
       this.history.push(newHistoryEntry) // If the current state or label has changed, add the new history entry
     }

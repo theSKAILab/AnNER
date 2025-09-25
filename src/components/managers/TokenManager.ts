@@ -181,7 +181,7 @@ export class TokenManager {
     if (currentParagraph) {
       // Reset previous annotation state
       currentParagraph.entities.forEach((entity: Entity) => {
-        entity.labelClass = this.labelManager.getLabelByName(entity.labelName)
+        entity.labelClass = this.labelManager.getLabelByName(entity.labelName ?? entity.labelClass?.name)
         this.addBlockFromStructure(entity)
       })
     }
