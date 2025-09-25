@@ -49,7 +49,6 @@
 </template>
 
 <script lang="ts">
-import { mapMutations } from 'vuex/dist/vuex.cjs.js'
 import Token from './Token'
 import { mapState } from 'vuex'
 
