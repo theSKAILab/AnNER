@@ -57,6 +57,21 @@ export class TMToken implements TMTokens {
   }
 }
 
+export class TMTokenAggregate implements TMTokens {
+  public tokenBlocks: TMTokenBlock[]
+  public start: number
+  public end: number
+  public type: string = 'token-aggregate' // Default type for token aggregates
+  public currentState: string | undefined
+
+  constructor(tokenBlocks: TMTokenBlock[]) {
+    this.tokenBlocks = tokenBlocks
+    this.start = tokenBlocks[0].start
+    this.end = tokenBlocks[tokenBlocks.length - 1].end
+    this.currentState = undefined
+  }
+}
+
 /**
  * Class representing a block of tokens in the TokenManager.
  * @description This class implements the TMTokens interface and represents a block of tokens with its start, end, label class, current state, and history.
@@ -225,26 +240,27 @@ export class TokenManager {
     labelClass: Label | undefined,
     currentState: string,
     history: History[] = [],
+    manualState: boolean = false
   ): void {
     const selectionStart: number = end < start ? end : start
     const selectionEnd: number = end > start ? end : start
 
     const overlappedBlocks: TMTokens[] | null = this.isOverlapping(selectionStart, selectionEnd)
 
-    // If there are any overlapping TMTokenBlocks, we need to handle that edge case
-    // This will use the properties of the first returned block
-    // to overwrite the properties of the new block
+    // If there are overlapping blocks, temporarily remove them, reintroduce their tokens, add the new block, then reinsert the other blocks
     if (overlappedBlocks) {
       overlappedBlocks.sort((a, b) => a.start - b.start)
 
-      if (overlappedBlocks[0] instanceof TMTokenBlock) history = overlappedBlocks[0].history
+      // if (overlappedBlocks[0] instanceof TMTokenBlock) history = overlappedBlocks[0].history
 
+      // Step 1: Remove overlapping blocks and reintroduce their tokens
       for (const block of overlappedBlocks) {
+        if (!manualState) block.currentState = 'Rejected' // Set overlapped blocks to Rejected
         this.tokens = this.tokens.filter((token: TMTokens) => {
           return token.start != block.start
-        }) // Remove the block from the tokens array;
-        this.tokens.push(...(block as TMTokenBlock).tokens) // Reintroduce the tokens from the block
-        this.tokens.sort((a, b) => a.start - b.start) // Sort the tokens array
+        })
+        this.tokens.push(...(block as TMTokenBlock).tokens)
+        this.tokens.sort((a, b) => a.start - b.start)
       }
     }
 
@@ -271,7 +287,28 @@ export class TokenManager {
       ),
     )
 
+    // Reinsert original overlapped blocks if any
+    if (overlappedBlocks) {
+      for (const block of overlappedBlocks) {
+        if (block instanceof TMTokenBlock) {
+          this.tokens.push(block)
+        }
+      }
+    }
+
     this.tokens.sort((a, b) => a.start - b.start)
+
+    // Remove individual tokens that are covered by any token block
+    const tokenBlocks = this.tokens.filter(token => token instanceof TMTokenBlock) as TMTokenBlock[]
+    this.tokens = this.tokens.filter(token => {
+      if (token instanceof TMTokenBlock) {
+        return true // Keep all token blocks
+      }
+      // Remove individual tokens that are covered by any token block
+      return !tokenBlocks.some(block => 
+        token.start >= block.start && token.end <= block.end
+      )
+    })
   }
 
   /**
@@ -287,6 +324,7 @@ export class TokenManager {
       entity.labelClass,
       entity.currentState || 'Candidate',
       entity.history || [],
+      true // Since we are directly importing the block, do not calculate the state
     )
     this.edited++
   }
