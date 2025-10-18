@@ -3,7 +3,9 @@ import { mapMutations, mapState } from 'vuex'
 import Token from '../blocks/Token'
 import TokenBlock from '../blocks/TokenBlock'
 import LabelsBlock from '../blocks/LabelsBlock.vue'
+import AggregateBlock from '../blocks/AggregateBlock.vue'
 import InfoBar from '../toolbars/InfoBar.vue'
+import { TMToken, TMTokenAggregate, TMTokenBlock } from '../managers/TokenManager'
 
 export default {
   name: 'SharedEditorFunctions',
@@ -12,6 +14,14 @@ export default {
     TokenBlock,
     LabelsBlock,
     InfoBar,
+    AggregateBlock
+  },
+  data() {
+    return {
+      TMToken,
+      TMTokenAggregate,
+      TMTokenBlock
+    }
   },
   computed: {
     ...mapState([
