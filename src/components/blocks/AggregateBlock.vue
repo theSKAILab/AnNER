@@ -20,7 +20,7 @@ export default {
   },
   props: ['tokenBlocks'],
   computed: {
-    ...mapState(['currentPage', 'labelManager', 'undoManager', 'tokenManager']),
+    ...mapState(['currentPage', 'labelManager', 'versionControlManager', 'tokenManager']),
   },
   methods: {
     

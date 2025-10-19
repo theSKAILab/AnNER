@@ -81,8 +81,8 @@
               <q-item
                 clickable
                 v-close-popup
-                @click="undoManager.undo(tokenManager)"
-                :class="$store.state.currentPage == 'start' || !undoManager.canUndo ? 'disabled' : ''"
+                @click="versionControlManager.undo(tokenManager)"
+                :class="$store.state.currentPage == 'start' || !versionControlManager.canUndo ? 'disabled' : ''"
               >
                 <q-item-section>
                   <span>Undo</span>
@@ -92,8 +92,8 @@
               <q-item
                 clickable
                 v-close-popup
-                @click="undoManager.redo(tokenManager)"
-                :class="$store.state.currentPage == 'start' || !undoManager.canRedo ? 'disabled' : ''"
+                @click="versionControlManager.redo(tokenManager)"
+                :class="$store.state.currentPage == 'start' || !versionControlManager.canRedo ? 'disabled' : ''"
               >
                 <q-item-section>
                   <span>Redo</span>
@@ -103,8 +103,8 @@
               <q-item
                 clickable
                 v-close-popup
-                @click="undoManager.undoAll(tokenManager)"
-                :class="$store.state.currentPage == 'start' || !undoManager.canUndo ? 'disabled' : ''"
+                @click="versionControlManager.undoAll(tokenManager)"
+                :class="$store.state.currentPage == 'start' || !versionControlManager.canUndo ? 'disabled' : ''"
               >
                 <q-item-section>
                   <span>Undo All</span>
@@ -258,7 +258,7 @@ export default {
       'currentPage',
       'annotationManager',
       'labelManager',
-      'undoManager',
+      'versionControlManager',
       'tokenManager',
       'tokenManagers'
     ]),
@@ -304,13 +304,13 @@ export default {
 
       // Edit Menu Binds
       if (e.key == 'z' && e.ctrlKey && isValid) {
-        this.undoManager.undo(this.tokenManager)
+        this.versionControlManager.undo(this.tokenManager)
       }
       if (e.key == 'y' && e.ctrlKey && isValid) {
-        this.undoManager.redo(this.tokenManager)
+        this.versionControlManager.redo(this.tokenManager)
       }
       if (e.key == 'z' && e.altKey && isValid) {
-        this.undoManager.undoAll(this.tokenManager)
+        this.versionControlManager.undoAll(this.tokenManager)
       }
 
       // Annotator Menu Binds

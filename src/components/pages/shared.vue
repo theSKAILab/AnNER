@@ -30,7 +30,7 @@ export default {
       'labelManager',
       'annotationManager',
       'tokenManager',
-      'undoManager',
+      'versionControlManager',
       'tokenManagers'
     ]),
     tmEdited() {
@@ -118,7 +118,7 @@ export default {
             persistent: true,
           })
           .onOk(() => {
-            this.undoManager.addUndo(this.tokenManager)
+            this.versionControlManager.addUndo(this.tokenManager)
             this.tokenManager.addNewBlock(
               start,
               end,
@@ -128,7 +128,7 @@ export default {
             )
           })
       } else {
-        this.undoManager.addUndo(this.tokenManager)
+        this.versionControlManager.addUndo(this.tokenManager)
         this.tokenManager.addNewBlock(
           start,
           end,
@@ -146,7 +146,7 @@ export default {
      * @param {Number} blockStart - The start position of the block to remove
      */
     onRemoveBlock(blockStart: number) {
-      this.undoManager.addUndo(this.tokenManager)
+      this.versionControlManager.addUndo(this.tokenManager)
       this.tokenManager.removeBlock(blockStart)
     },
     beforeLeave() {

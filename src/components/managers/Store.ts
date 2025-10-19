@@ -1,7 +1,7 @@
 import { TokenManager } from '@/components/managers/TokenManager.ts'
 import { AnnotationManager } from '@/components/managers/AnnotationManager.ts'
 import { LabelManager } from '@/components/managers/LabelManager.ts'
-import { UndoManager } from '@/components/managers/UndoManager.ts'
+import { VersionControlManager } from '@/components/managers/VersionControlManager.ts'
 
 import { createStore, Store } from 'vuex'
 import type { InjectionKey } from 'vue'
@@ -74,7 +74,7 @@ const mutations = {
       state.currentIndex < state.annotationManager.inputSentences.length - 1
     ) {
       state.currentIndex += 1
-      state.undoManager = new UndoManager()
+      state.versionControlManager = new VersionControlManager()
     }
   },
 
@@ -86,7 +86,7 @@ const mutations = {
   previousSentence(state: State): void {
     if (state.currentIndex > 0) {
       state.currentIndex -= 1
-      state.undoManager = new UndoManager()
+      state.versionControlManager = new VersionControlManager()
     }
   },
 
@@ -112,7 +112,7 @@ const mutations = {
 
   /**
    * Set the TokenManager in the store.
-   * @description This mutation initializes the TokenManager and sets it in the store state, along with the UndoManager.
+   * @description This mutation initializes the TokenManager and sets it in the store state, along with the VersionControlManager.
    * @param {State} state - The current state of the store.
    * @param {TokenManager} tokenManager - The TokenManager instance to set in the store.
    */
@@ -128,7 +128,7 @@ interface State {
   annotationManager: AnnotationManager | null // Global annotation manager
   labelManager: LabelManager | null // Global label manager,
   tokenManager: TokenManager | null // Global token manager,
-  undoManager: UndoManager | null // Global undo manager
+  versionControlManager: VersionControlManager | null // Global version control manager
   tokenManagers: TokenManager[] | null // Array of token managers for each sentence
 }
 
@@ -141,16 +141,16 @@ export const store = createStore<State>({
       annotationManager: null, // Global annotation manager
       labelManager: null, // Global label manager,
       tokenManager: null, // Global token manager,
-      undoManager: new UndoManager(), // Global undo manager
+      versionControlManager: new VersionControlManager(), // Global version control manager
       tokenManagers: [], // Array of token managers for each sentence
     }
   },
   mutations,
 })
 
-// Initialize UndoManager with store reference
-if (store.state.undoManager) {
-  store.state.undoManager.setStore(store)
+// Initialize VersionControlManager with store reference
+if (store.state.versionControlManager) {
+  store.state.versionControlManager.setStore(store)
 }
 
 export const key: InjectionKey<Store<State>> = Symbol()
