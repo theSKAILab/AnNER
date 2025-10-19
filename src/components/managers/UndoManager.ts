@@ -1,223 +1,358 @@
-import TokenManager, { TMTokenBlock } from './TokenManager.ts'
+import { Store } from 'vuex'
+import { TokenManager, type TMTokens, TMToken, TMTokenBlock } from './TokenManager'
 
 /**
- * UndoManager class for managing undo actions in the application.
- * @description This class provides functionality to manage undo actions, allowing users to revert changes made to the token manager.
- * @property {UndoAction[]} undoStack - An array of undo actions that can be performed.
- * @property {boolean} canUndo - A boolean indicating whether there are any actions that can be undone.
+ * Interface for state snapshots captured by the UndoManager.
+ * @description This interface defines the structure for state snapshots that can be restored.
+ */
+interface StateSnapshot {
+  tokenManagerState: TMTokens[]
+  currentIndex: number
+  edited: number
+  timestamp: number
+  tokenManagers?: SerializedTokenManager[]
+}
+
+/**
+ * Interface for serialized TokenManager state.
+ * @description Used to serialize and restore complete TokenManager instances.
+ */
+interface SerializedTokenManager {
+  tokens: TMTokens[]
+  edited: number
+}
+
+/**
+ * Enhanced UndoManager class for managing undo/redo operations with Vuex integration.
+ * @description This class provides comprehensive undo/redo functionality using state snapshots,
+ * supporting both individual TokenManager operations and global store state changes.
  */
 export class UndoManager {
-  private undoStack: UndoAction[] = []
+  private undoStack: StateSnapshot[] = []
+  private redoStack: StateSnapshot[] = []
+  private maxStackSize: number = 50
+  private store?: Store<{
+    currentIndex: number
+    tokenManager: TokenManager | null
+    tokenManagers: TokenManager[] | null
+  }>
 
   public get canUndo(): boolean {
     return this.undoStack.length > 0
   }
 
-  /**
-   * Add a new undo action to the stack.
-   * @description This method adds a new action to the undo stack, which can later be undone.
-   * @param {UndoAction} action - The action to be added to the undo stack.
-   * @returns {void}
-   */
-  private add(action: UndoAction): void {
-    this.undoStack.push(action)
+  public get canRedo(): boolean {
+    return this.redoStack.length > 0
   }
 
   /**
-   * Undo the last action in the stack.
-   * @description This method pops the last action from the undo stack and executes its callback.
-   * @param {TokenManager} tokenManager - The TokenManager instance to apply the undo action to.
-   * @returns {void}
+   * Initialize the UndoManager with a reference to the Vuex store.
+   * @param store - The Vuex store instance
+   */
+  public setStore(store: Store<{ currentIndex: number; tokenManager: TokenManager | null; tokenManagers: TokenManager[] | null }>): void {
+    this.store = store
+  }
+
+  /**
+   * Get the number of undo operations available.
+   * @returns The number of states in the undo stack
+   */
+  public getUndoCount(): number {
+    return this.undoStack.length
+  }
+
+  /**
+   * Get the number of redo operations available.
+   * @returns The number of states in the redo stack
+   */
+  public getRedoCount(): number {
+    return this.redoStack.length
+  }
+
+  /**
+   * Set the maximum stack size for undo/redo operations.
+   * @param size - The maximum number of states to keep in memory
+   */
+  public setMaxStackSize(size: number): void {
+    this.maxStackSize = size
+    this.trimStack()
+  }
+
+  /**
+   * Clear all undo/redo history.
+   */
+  public clearHistory(): void {
+    this.undoStack = []
+    this.redoStack = []
+  }
+
+  /**
+   * Capture the current state before making changes.
+   * @description This method should be called before any operation that modifies the TokenManager state.
+   * @param tokenManager - The TokenManager instance to capture state for
+   */
+  public addUndo(tokenManager: TokenManager): void {
+    // Clear redo stack when new operation is performed
+    this.redoStack = []
+    
+    // Create state snapshot
+    const snapshot: StateSnapshot = {
+      tokenManagerState: this.serializeTokens(tokenManager.tokens),
+      currentIndex: this.store?.state.currentIndex || 0,
+      edited: tokenManager.edited,
+      timestamp: Date.now()
+    }
+
+    // If store is available, also capture tokenManagers array
+    if (this.store?.state.tokenManagers) {
+      snapshot.tokenManagers = this.store.state.tokenManagers.map(tm => ({
+        tokens: this.serializeTokens(tm.tokens),
+        edited: tm.edited
+      }))
+    }
+
+    this.undoStack.push(snapshot)
+    this.trimStack()
+  }
+
+  /**
+   * Undo the last operation.
+   * @param tokenManager - The TokenManager instance to restore state to
    */
   public undo(tokenManager: TokenManager): void {
-    const latestAction: UndoAction | undefined = this.undoStack.pop()
-    if (latestAction) {
-      latestAction.callback(tokenManager)
+    const snapshot = this.undoStack.pop()
+    if (!snapshot) return
+
+    // Save current state to redo stack before restoring
+    const currentSnapshot: StateSnapshot = {
+      tokenManagerState: this.serializeTokens(tokenManager.tokens),
+      currentIndex: this.store?.state.currentIndex || 0,
+      edited: tokenManager.edited,
+      timestamp: Date.now()
     }
+
+    if (this.store?.state.tokenManagers) {
+      currentSnapshot.tokenManagers = this.store.state.tokenManagers.map(tm => ({
+        tokens: this.serializeTokens(tm.tokens),
+        edited: tm.edited
+      }))
+    }
+
+    this.redoStack.push(currentSnapshot)
+
+    // Restore the snapshot
+    this.restoreSnapshot(snapshot, tokenManager)
   }
 
   /**
-   * Undo all actions in the stack.
-   * @description This method iterates through the undo stack and applies each action's callback, effectively reverting all changes made.
-   * @param {TokenManager} tokenManager - The TokenManager instance to apply the undo actions to.
-   * @returns {void}
+   * Redo the next operation.
+   * @param tokenManager - The TokenManager instance to restore state to
+   */
+  public redo(tokenManager: TokenManager): void {
+    const snapshot = this.redoStack.pop()
+    if (!snapshot) return
+
+    // Save current state to undo stack before restoring
+    const currentSnapshot: StateSnapshot = {
+      tokenManagerState: this.serializeTokens(tokenManager.tokens),
+      currentIndex: this.store?.state.currentIndex || 0,
+      edited: tokenManager.edited,
+      timestamp: Date.now()
+    }
+
+    if (this.store?.state.tokenManagers) {
+      currentSnapshot.tokenManagers = this.store.state.tokenManagers.map(tm => ({
+        tokens: this.serializeTokens(tm.tokens),
+        edited: tm.edited
+      }))
+    }
+
+    this.undoStack.push(currentSnapshot)
+
+    // Restore the snapshot
+    this.restoreSnapshot(snapshot, tokenManager)
+  }
+
+  /**
+   * Undo all operations back to the initial state.
+   * @param tokenManager - The TokenManager instance to restore state to
    */
   public undoAll(tokenManager: TokenManager): void {
-    while (this.undoStack.length > 0) {
-      this.undo(tokenManager)
+    if (this.undoStack.length === 0) return
+
+    // Save current state to redo stack
+    const currentSnapshot: StateSnapshot = {
+      tokenManagerState: this.serializeTokens(tokenManager.tokens),
+      currentIndex: this.store?.state.currentIndex || 0,
+      edited: tokenManager.edited,
+      timestamp: Date.now()
+    }
+
+    if (this.store?.state.tokenManagers) {
+      currentSnapshot.tokenManagers = this.store.state.tokenManagers.map(tm => ({
+        tokens: this.serializeTokens(tm.tokens),
+        edited: tm.edited
+      }))
+    }
+
+    // Move all undo states to redo stack (in reverse order to maintain chronology)
+    const allStates = [...this.undoStack]
+    this.redoStack = [currentSnapshot, ...allStates.reverse()]
+
+    // Get the oldest state (first in undo stack)
+    const oldestState = this.undoStack[0]
+    this.undoStack = []
+
+    // Restore to oldest state
+    this.restoreSnapshot(oldestState, tokenManager)
+  }
+
+  /**
+   * Serialize tokens array for storage in snapshot.
+   * @param tokens - The tokens array to serialize
+   * @returns Serialized tokens that can be stored and later restored
+   */
+  private serializeTokens(tokens: TMTokens[]): TMTokens[] {
+    return tokens.map(token => {
+      if ('type' in token && token.type === 'token-block') {
+        const block = token as TMTokenBlock
+        return {
+          type: 'token-block',
+          start: block.start,
+          end: block.end,
+          currentState: block.currentState,
+          tokens: [...block.tokens],
+          labelClass: { ...block.labelClass },
+          reviewed: block.reviewed,
+          history: [...block.history]
+        } as TMTokens
+      } else if ('type' in token && token.type === 'token') {
+        const tmToken = token as TMToken
+        return {
+          type: 'token',
+          start: tmToken.start,
+          end: tmToken.end,
+          currentState: tmToken.currentState,
+          text: tmToken.text
+        } as TMTokens
+      }
+      return { ...token }
+    })
+  }
+
+  /**
+   * Restore a state snapshot to the TokenManager.
+   * @param snapshot - The state snapshot to restore
+   * @param tokenManager - The TokenManager instance to restore to
+   */
+  private restoreSnapshot(snapshot: StateSnapshot, tokenManager: TokenManager): void {
+    // Restore tokens
+    tokenManager.tokens = this.deserializeTokens(snapshot.tokenManagerState)
+    tokenManager.edited = snapshot.edited
+
+    // Update store state if store reference is available
+    if (this.store) {
+      // Update current index if it has changed
+      if (this.store.state.currentIndex !== snapshot.currentIndex) {
+        this.store.commit('setCurrentIndex', snapshot.currentIndex)
+      }
+
+      // Restore tokenManagers array if it was captured
+      if (snapshot.tokenManagers && this.store.state.tokenManagers) {
+        snapshot.tokenManagers.forEach((serialized, index) => {
+          const originalTM = this.store!.state.tokenManagers![index]
+          if (originalTM) {
+            originalTM.tokens = this.deserializeTokens(serialized.tokens)
+            originalTM.edited = serialized.edited
+          }
+        })
+        // Note: We don't commit this directly as it might interfere with reactivity
+        // The tokenManager parameter should be the active one from the store
+      }
     }
   }
 
   /**
-   * Add a create undo action to the stack.
-   * @description This method creates a new delete action and adds it to the undo stack.
-   * @param {number} start - The start index of the block to be deleted.
-   * @returns {void}
+   * Deserialize tokens array from snapshot storage.
+   * @param serializedTokens - The serialized tokens to restore
+   * @returns Properly reconstructed TMTokens array
    */
-  public addCreateUndo(start: number) {
-    const newAction: DeleteAction = new DeleteAction(start)
-    this.add(newAction)
+  private deserializeTokens(serializedTokens: TMTokens[]): TMTokens[] {
+    return serializedTokens.map(token => {
+      if ('type' in token && token.type === 'token-block') {
+        const serialized = token as TMTokenBlock & { 
+          tokens: TMToken[]
+          labelClass: { name: string; color: string; id: string }
+          history: { action: string; timestamp: number }[] 
+        }
+        return new TMTokenBlock(
+          serialized.start,
+          serialized.end,
+          serialized.tokens,
+          serialized.labelClass,
+          serialized.currentState,
+          serialized.reviewed,
+          serialized.history
+        )
+      } else if ('type' in token && token.type === 'token') {
+        const serialized = token as TMToken & { text: string }
+        return new TMToken(
+          serialized.start,
+          serialized.end,
+          serialized.text,
+          serialized.currentState
+        )
+      }
+      return token
+    })
   }
 
   /**
-   * Add a delete undo action to the stack.
-   * @description This method creates a new create action and adds it to the undo stack.
-   * @param {TMTokenBlock} block - The token block to be created.
-   * @returns {void}
+   * Trim the undo stack to the maximum allowed size.
    */
-  public addDeleteUndo(block: TMTokenBlock) {
-    const newAction: CreateAction = new CreateAction(block.start, block)
-    this.add(newAction)
-  }
-
-  /**
-   * Add an update undo action to the stack.
-   * @description This method creates a new update action and adds it to the undo stack.
-   * @param {TMTokenBlock} block - The token block to be updated.
-   * @returns {void}
-   */
-  public addUpdateUndo(block: TMTokenBlock) {
-    const newAction: UpdateAction = new UpdateAction(block)
-    this.add(newAction)
-  }
-
-  /**
-   * Add an overlapping undo action to the stack.
-   * @description This method creates a new overlapping action and adds it to the undo stack.
-   * @param {TMTokenBlock[]} overlappingBlocks - An array of token blocks that overlap with the new block.
-   * @param {number} newBlockStart - The start index of the new block that overlaps with existing blocks.
-   * @returns {void}
-   */
-  public addOverlappingUndo(overlappingBlocks: TMTokenBlock[], newBlockStart: number) {
-    const newAction: OverlappingAction = new OverlappingAction(overlappingBlocks, newBlockStart)
-    this.add(newAction)
-  }
-}
-
-/**
- * Abstract class representing an undo action.
- * @description This class serves as a base for all undo actions, providing a type and a callback method that must be implemented by subclasses.
- * @property {string} type - The type of the undo action.
- */
-export abstract class UndoAction {
-  static CreateAction: string = 'create'
-  static DeleteAction: string = 'remove'
-  static UpdateAction: string = 'update'
-  static OverlappingAction: string = 'overlapping'
-
-  public type: string
-
-  constructor(type: string) {
-    this.type = type
-  }
-
-  /**
-   * Callback method to be implemented by subclasses.
-   * @description This method is called when the undo action is executed, allowing subclasses to define their specific behavior.
-   * @param {TokenManager} tokenManager - The TokenManager instance to apply the undo action to.
-   * @returns {void}
-   */
-  abstract callback(tokenManager: TokenManager): void
-}
-
-/**
- * Class representing a create undo action.
- * @description This class extends UndoAction and implements the callback method to add a block to the TokenManager.
- * @property {string} type - The type of the undo action, set to 'create'.
- * @property {number} start - The start index of the block to be created.
- * @property {TMTokenBlock} block - The token block to be created.
- * @extends UndoAction
- */
-export class CreateAction extends UndoAction {
-  type: string = UndoAction.CreateAction
-  private start: number
-  private block: TMTokenBlock
-
-  constructor(start: number, block: TMTokenBlock) {
-    super(UndoAction.CreateAction)
-    this.start = start
-    this.block = block
-  }
-
-  callback(tokenManager: TokenManager): void {
-    tokenManager.addBlockFromStructure(this.block)
-  }
-}
-
-/**
- * Class representing a delete undo action.
- * @description This class extends UndoAction and implements the callback method to remove a block from the TokenManager.
- * @property {string} type - The type of the undo action, set to 'remove'.
- * @property {number} start - The start index of the block to be deleted.
- * @extends UndoAction
- */
-export class DeleteAction extends UndoAction {
-  type: string = UndoAction.DeleteAction
-  private start: number
-
-  constructor(start: number) {
-    super(UndoAction.DeleteAction)
-    this.start = start
-  }
-
-  callback(tokenManager: TokenManager): void {
-    tokenManager.removeBlock(this.start)
-  }
-}
-
-/**
- * Class representing an update undo action.
- * @description This class extends UndoAction and implements the callback method to update a block in the TokenManager.
- * @property {string} type - The type of the undo action, set to 'update'.
- * @property {TMTokenBlock} block - The token block to be updated.
- * @extends UndoAction
- */
-export class UpdateAction extends UndoAction {
-  type: string = UndoAction.UpdateAction
-  private block: TMTokenBlock
-
-  constructor(block: TMTokenBlock) {
-    super(UndoAction.UpdateAction)
-    this.block = block
-  }
-
-  callback(tokenManager: TokenManager): void {
-    tokenManager.removeBlock(this.block.start)
-    tokenManager.addBlockFromStructure(this.block)
-  }
-}
-
-/**
- * Class representing an overlapping undo action.
- * @description This class extends UndoAction and implements the callback method to handle overlapping blocks in the TokenManager.
- * @property {string} type - The type of the undo action, set to 'overlapping'.
- * @property {TMTokenBlock[]} overlappingBlocks - An array of token blocks that overlap with the new block.
- * @property {number} newBlockStart - The start index of the new block that overlaps with existing blocks.
- * @extends UndoAction
- */
-export class OverlappingAction extends UndoAction {
-  type: string = UndoAction.OverlappingAction
-  private overlappingBlocks: TMTokenBlock[]
-  private newBlockStart: number
-
-  constructor(overlappingBlocks: TMTokenBlock[], newBlockStart: number) {
-    super(UndoAction.OverlappingAction)
-    this.overlappingBlocks = overlappingBlocks
-    this.newBlockStart = newBlockStart
-  }
-
-  callback(tokenManager: TokenManager): void {
-    let earliestStart: number | null = null
-
-    if (this.newBlockStart < this.overlappingBlocks[0].start) {
-      earliestStart = this.newBlockStart
-    } else {
-      earliestStart = this.overlappingBlocks[0].start
+  private trimStack(): void {
+    if (this.undoStack.length > this.maxStackSize) {
+      this.undoStack = this.undoStack.slice(-this.maxStackSize)
     }
-    tokenManager.removeBlock(earliestStart, true)
-    // Add the old blocks back
-    for (const block of this.overlappingBlocks) {
-      tokenManager.addBlockFromStructure(block)
+    if (this.redoStack.length > this.maxStackSize) {
+      this.redoStack = this.redoStack.slice(-this.maxStackSize)
     }
+  }
+
+  // Legacy methods for backward compatibility
+  /**
+   * @deprecated Use addUndo(tokenManager) instead
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public addCreateUndo(_start: number): void {
+    // This method is deprecated but maintained for backward compatibility
+    console.warn('addCreateUndo is deprecated. Use addUndo(tokenManager) instead.')
+  }
+
+  /**
+   * @deprecated Use addUndo(tokenManager) instead
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public addDeleteUndo(_block: TMTokenBlock): void {
+    // This method is deprecated but maintained for backward compatibility
+    console.warn('addDeleteUndo is deprecated. Use addUndo(tokenManager) instead.')
+  }
+
+  /**
+   * @deprecated Use addUndo(tokenManager) instead
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public addUpdateUndo(_block: TMTokenBlock): void {
+    // This method is deprecated but maintained for backward compatibility
+    console.warn('addUpdateUndo is deprecated. Use addUndo(tokenManager) instead.')
+  }
+
+  /**
+   * @deprecated Use addUndo(tokenManager) instead
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public addOverlappingUndo(_overlappingBlocks: TMTokenBlock[], _newBlockStart: number): void {
+    // This method is deprecated but maintained for backward compatibility
+    console.warn('addOverlappingUndo is deprecated. Use addUndo(tokenManager) instead.')
   }
 }

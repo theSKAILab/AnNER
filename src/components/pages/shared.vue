@@ -118,7 +118,7 @@ export default {
             persistent: true,
           })
           .onOk(() => {
-            this.undoManager.addOverlappingUndo(existingBlocks, start)
+            this.undoManager.addUndo(this.tokenManager)
             this.tokenManager.addNewBlock(
               start,
               end,
@@ -128,6 +128,7 @@ export default {
             )
           })
       } else {
+        this.undoManager.addUndo(this.tokenManager)
         this.tokenManager.addNewBlock(
           start,
           end,
@@ -135,7 +136,6 @@ export default {
           this.currentPage == 'annotate' ? 'Candidate' : 'Suggested',
           [],
         )
-        if (this.tokenManager.getBlockByStart(start)) this.undoManager.addCreateUndo(start)
       }
 
       selection?.empty()
@@ -146,7 +146,7 @@ export default {
      * @param {Number} blockStart - The start position of the block to remove
      */
     onRemoveBlock(blockStart: number) {
-      this.undoManager.addDeleteUndo(this.tokenManager.getBlockByStart(blockStart))
+      this.undoManager.addUndo(this.tokenManager)
       this.tokenManager.removeBlock(blockStart)
     },
     beforeLeave() {

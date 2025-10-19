@@ -101,6 +101,16 @@ const mutations = {
   },
 
   /**
+   * Set the current index in the store.
+   * @description This mutation updates the current index state, used for navigation between sentences.
+   * @param {State} state - The current state of the store.
+   * @param {number} index - The index to set as the current index.
+   */
+  setCurrentIndex(state: State, index: number): void {
+    state.currentIndex = index
+  },
+
+  /**
    * Set the TokenManager in the store.
    * @description This mutation initializes the TokenManager and sets it in the store state, along with the UndoManager.
    * @param {State} state - The current state of the store.
@@ -137,5 +147,10 @@ export const store = createStore<State>({
   },
   mutations,
 })
+
+// Initialize UndoManager with store reference
+if (store.state.undoManager) {
+  store.state.undoManager.setStore(store)
+}
 
 export const key: InjectionKey<Store<State>> = Symbol()
