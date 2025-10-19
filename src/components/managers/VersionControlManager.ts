@@ -2,7 +2,7 @@ import { Store } from 'vuex'
 import { TokenManager, type TMTokens, TMToken, TMTokenBlock } from './TokenManager'
 
 /**
- * Interface for state snapshots captured by the UndoManager.
+ * Interface for state snapshots captured by the VersionControlManager.
  * @description This interface defines the structure for state snapshots that can be restored.
  */
 interface StateSnapshot {
@@ -23,11 +23,11 @@ interface SerializedTokenManager {
 }
 
 /**
- * Enhanced UndoManager class for managing undo/redo operations with Vuex integration.
+ * Enhanced VersionControlManager class for managing undo/redo operations with Vuex integration.
  * @description This class provides comprehensive undo/redo functionality using state snapshots,
  * supporting both individual TokenManager operations and global store state changes.
  */
-export class UndoManager {
+export class VersionControlManager {
   private undoStack: StateSnapshot[] = []
   private redoStack: StateSnapshot[] = []
   private maxStackSize: number = 50
@@ -46,7 +46,7 @@ export class UndoManager {
   }
 
   /**
-   * Initialize the UndoManager with a reference to the Vuex store.
+   * Initialize the VersionControlManager with a reference to the Vuex store.
    * @param store - The Vuex store instance
    */
   public setStore(store: Store<{ currentIndex: number; tokenManager: TokenManager | null; tokenManagers: TokenManager[] | null }>): void {
