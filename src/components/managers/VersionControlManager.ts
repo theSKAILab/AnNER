@@ -178,33 +178,19 @@ export class VersionControlManager {
    * @param tokenManager - The TokenManager instance to restore state to
    */
   public undoAll(tokenManager: TokenManager): void {
-    if (this.undoStack.length === 0) return
-
-    // Save current state to redo stack
-    const currentSnapshot: StateSnapshot = {
-      tokenManagerState: this.serializeTokens(tokenManager.tokens),
-      currentIndex: this.store?.state.currentIndex || 0,
-      edited: tokenManager.edited,
-      timestamp: Date.now()
+    while (this.canUndo) {
+      this.undo(tokenManager)
     }
+  }
 
-    if (this.store?.state.tokenManagers) {
-      currentSnapshot.tokenManagers = this.store.state.tokenManagers.map(tm => ({
-        tokens: this.serializeTokens(tm.tokens),
-        edited: tm.edited
-      }))
+  /**
+   * Redo all operations to the most recent state.
+   * @param tokenManager - The TokenManager instance to restore state to
+   */
+  public redoAll(tokenManager: TokenManager): void {
+    while (this.canRedo) {
+      this.redo(tokenManager)
     }
-
-    // Move all undo states to redo stack (in reverse order to maintain chronology)
-    const allStates = [...this.undoStack]
-    this.redoStack = [currentSnapshot, ...allStates.reverse()]
-
-    // Get the oldest state (first in undo stack)
-    const oldestState = this.undoStack[0]
-    this.undoStack = []
-
-    // Restore to oldest state
-    this.restoreSnapshot(oldestState, tokenManager)
   }
 
   /**
@@ -317,42 +303,5 @@ export class VersionControlManager {
     if (this.redoStack.length > this.maxStackSize) {
       this.redoStack = this.redoStack.slice(-this.maxStackSize)
     }
-  }
-
-  // Legacy methods for backward compatibility
-  /**
-   * @deprecated Use addUndo(tokenManager) instead
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public addCreateUndo(_start: number): void {
-    // This method is deprecated but maintained for backward compatibility
-    console.warn('addCreateUndo is deprecated. Use addUndo(tokenManager) instead.')
-  }
-
-  /**
-   * @deprecated Use addUndo(tokenManager) instead
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public addDeleteUndo(_block: TMTokenBlock): void {
-    // This method is deprecated but maintained for backward compatibility
-    console.warn('addDeleteUndo is deprecated. Use addUndo(tokenManager) instead.')
-  }
-
-  /**
-   * @deprecated Use addUndo(tokenManager) instead
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public addUpdateUndo(_block: TMTokenBlock): void {
-    // This method is deprecated but maintained for backward compatibility
-    console.warn('addUpdateUndo is deprecated. Use addUndo(tokenManager) instead.')
-  }
-
-  /**
-   * @deprecated Use addUndo(tokenManager) instead
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public addOverlappingUndo(_overlappingBlocks: TMTokenBlock[], _newBlockStart: number): void {
-    // This method is deprecated but maintained for backward compatibility
-    console.warn('addOverlappingUndo is deprecated. Use addUndo(tokenManager) instead.')
   }
 }

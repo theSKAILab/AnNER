@@ -111,6 +111,17 @@
                   <span class="keyboard-tip">Alt + Z</span>
                 </q-item-section>
               </q-item>
+              <q-item
+                clickable
+                v-close-popup
+                @click="versionControlManager.redoAll(tokenManager)"
+                :class="$store.state.currentPage == 'start' || !versionControlManager.canRedo ? 'disabled' : ''"
+              >
+                <q-item-section>
+                  <span>Redo All</span>
+                  <span class="keyboard-tip">Alt + Y</span>
+                </q-item-section>
+              </q-item>
             </q-list>
           </q-menu>
         </div>
@@ -311,6 +322,9 @@ export default {
       }
       if (e.key == 'z' && e.altKey && isValid) {
         this.versionControlManager.undoAll(this.tokenManager)
+      }
+      if (e.key == 'y' && e.altKey && isValid) {
+        this.versionControlManager.redoAll(this.tokenManager)
       }
 
       // Annotator Menu Binds
