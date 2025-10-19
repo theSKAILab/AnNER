@@ -39,6 +39,30 @@ export default {
       }
       return []
     },
+    eligibleTokens() {
+      const renderList: TMTokens[] = [];
+      for (let i = 0; i < this.tokenManager.tokens.length; i++) {
+        const t = this.tokenManager.tokens[i];
+        if (t instanceof TMToken) {
+          renderList.push(t);
+        } else if (t instanceof TMTokenBlock) {
+          // Check if overlapping with any other blocks
+          const overlapping = this.tokenManager.isOverlapping(t.start, t.end);
+          if (overlapping && overlapping.length > 1) {
+            // If overlapping, check to ensure if entire overlap range is already in the list
+            // If not, add the entire list returned by isOverlapping to the renderList
+            const overlapAggregate = new TMTokenAggregate(overlapping);
+            if (!renderList.find(r => r instanceof TMTokenAggregate && r.start === overlapAggregate.start && r.end === overlapAggregate.end)) {
+              renderList.push(overlapAggregate);
+            }
+          } else {
+            // If not overlapping, add the block itself
+            renderList.push(t);
+          }
+        }
+      }
+      return renderList;
+    },
   },
   watch: {
     tmEdited: {

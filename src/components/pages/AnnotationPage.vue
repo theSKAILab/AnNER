@@ -2,17 +2,17 @@
   <div>
     <labels-block />
     <div class="q-pa-lg" style="height: calc(100vh - 190px); overflow-y: scroll">
-      <template v-for="t in this.tokenManager.tokens" :key="`${t.type}-${t.start}`">
-        <token v-if="t.type === 'token'" 
+      <template v-for="t in eligibleTokens" :key="`${t.type}-${t.start}`">
+        <token v-if="t instanceof TMToken" 
           :token="t"
           :class="[t.reviewed ? 'user-active' : 'user-inactive']" />
 
-        <aggregate-block v-else-if="this.tokenManager.isOverlapping(t.start, t.end)"
-            :tokenBlocks="this.tokenManager.getOverlappingBlocks(t.start, t.end)"
-            @remove-block="onRemoveBlock" />
+        <aggregate-block v-else-if="t instanceof TMTokenAggregate"
+          :tokenBlocks="t.tokenBlocks"
+          @remove-block="onRemoveBlock" />
 
-        <token-block v-else
-          :token="this.tokenManager.getBlockByStart(t.start)"
+        <token-block v-else-if="t instanceof TMTokenBlock"
+          :token="t"
           :class="[t.reviewed ? 'user-active' : 'user-inactive']"
           @remove-block="onRemoveBlock" />
       </template>
