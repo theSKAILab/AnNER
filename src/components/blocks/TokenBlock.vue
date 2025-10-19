@@ -74,7 +74,7 @@ export default {
   },
   methods: {
     cycleCurrentStatus() {
-      this.undoManager.addUpdateUndo({ ...this.token })
+      this.undoManager.addUndo(this.tokenManager)
       const nextState = Object.keys(this.states)[
         (this.states[this.token.currentState].numeric + 1) % 3
       ] // Cycle through Candidate, Accepted, Rejected
@@ -83,7 +83,7 @@ export default {
       this.token.reviewed = true
     },
     changeLabel() {
-      this.undoManager.addUpdateUndo({ ...this.token })
+      this.undoManager.addUndo(this.tokenManager)
       this.token.reviewed = true
       if (this.currentPage === 'review') {
         this.token.currentState = 'Suggested'
@@ -92,7 +92,7 @@ export default {
     },
     removeBlock() {
       if (this.currentPage == 'review') {
-        this.undoManager.addUpdateUndo({ ...this.token })
+        this.undoManager.addUndo(this.tokenManager)
         this.token.currentState = 'Rejected'
         this.token.reviewed = true
       } else {

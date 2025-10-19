@@ -82,7 +82,7 @@
                 clickable
                 v-close-popup
                 @click="undoManager.undo(tokenManager)"
-                :class="$store.state.currentPage == 'start' ? 'disabled' : ''"
+                :class="$store.state.currentPage == 'start' || !undoManager.canUndo ? 'disabled' : ''"
               >
                 <q-item-section>
                   <span>Undo</span>
@@ -92,8 +92,19 @@
               <q-item
                 clickable
                 v-close-popup
+                @click="undoManager.redo(tokenManager)"
+                :class="$store.state.currentPage == 'start' || !undoManager.canRedo ? 'disabled' : ''"
+              >
+                <q-item-section>
+                  <span>Redo</span>
+                  <span class="keyboard-tip">Ctrl + Y</span>
+                </q-item-section>
+              </q-item>
+              <q-item
+                clickable
+                v-close-popup
                 @click="undoManager.undoAll(tokenManager)"
-                :class="$store.state.currentPage == 'start' ? 'disabled' : ''"
+                :class="$store.state.currentPage == 'start' || !undoManager.canUndo ? 'disabled' : ''"
               >
                 <q-item-section>
                   <span>Undo All</span>
@@ -294,6 +305,9 @@ export default {
       // Edit Menu Binds
       if (e.key == 'z' && e.ctrlKey && isValid) {
         this.undoManager.undo(this.tokenManager)
+      }
+      if (e.key == 'y' && e.ctrlKey && isValid) {
+        this.undoManager.redo(this.tokenManager)
       }
       if (e.key == 'z' && e.altKey && isValid) {
         this.undoManager.undoAll(this.tokenManager)
