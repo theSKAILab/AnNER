@@ -1,0 +1,71 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { describe, it, expect, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+import InfoBar from '../../src/components/toolbars/InfoBar.vue'
+import { store } from '../../src/components/managers/Store'
+import { AnnotationManager } from '../../src/components/managers/AnnotationManager'
+import { LabelManager } from '../../src/components/managers/LabelManager'
+
+describe('InfoBar additional branches', () => {
+  it('getWordCount and getCharCount handle null and trim multiple spaces', () => {
+    // ensure store has an annotationManager so template render won't crash
+    store.state.annotationManager = AnnotationManager.fromText('one')
+    const wrapper = mount(InfoBar, { global: { mocks: { $store: store, emitter: { emit: () => {} } } } })
+    const vm: any = wrapper.vm
+
+    expect(vm.getWordCount(null)).toBe(0)
+    expect(vm.getCharCount(null)).toBe(0)
+
+    const txt = '  hello   world  '
+    expect(vm.getWordCount(txt)).toBe(2)
+    expect(vm.getCharCount(txt)).toBe(txt.length)
+  })
+
+  it('next and back call mutations and emit tokenizeCurrentSentence', async () => {
+    // Prepare store with at least two sentences
+    store.state.annotationManager = AnnotationManager.fromText('one\ntwo')
+    store.state.labelManager = new LabelManager()
+    store.state.tokenManagers = []
+
+  const emitter = { emit: vi.fn() }
+
+  const wrapper = mount(InfoBar, { global: { mocks: { $store: store, emitter } } })
+    const vm: any = wrapper.vm
+
+    const commitSpy = vi.spyOn(store, 'commit')
+
+    vm.next()
+    expect(commitSpy).toHaveBeenCalled()
+    expect(emitter.emit).toHaveBeenCalledWith('tokenizeCurrentSentence')
+
+    vm.back()
+    expect(commitSpy).toHaveBeenCalled()
+    expect(emitter.emit).toHaveBeenCalledWith('tokenizeCurrentSentence')
+  })
+
+  it('template shows Annotations count and button disabled states and reacts to dark mode', () => {
+    // Create annotationManager with one sentence and one annotation entity
+    const am = AnnotationManager.fromText('one')
+    am.annotations[0].entities = [{ id: 'e1' } as any]
+    store.state.annotationManager = am
+    store.state.currentIndex = 0
+
+    const wrapper = mount(InfoBar, { global: { mocks: { $store: store, $q: { dark: { isActive: true } }, emitter: { emit: () => {} } } } })
+
+    // The Annotations span should be present
+    expect(wrapper.html()).toContain('Annotations')
+
+    // Back button should be disabled at index 0 — locate by title attribute
+    const backBtn = wrapper.find('[title="Go back one sentence/paragraph"]')
+    expect(backBtn.exists()).toBe(true)
+    expect(backBtn.attributes('disabled')).toBeDefined()
+
+    // Next button should be disabled when index is last
+    store.state.currentIndex = am.inputSentences.length - 1
+    return wrapper.vm.$nextTick().then(() => {
+      const nextBtn = wrapper.find('[title="Go forward one sentence/paragraph"]')
+      expect(nextBtn.exists()).toBe(true)
+      expect(nextBtn.attributes('disabled')).toBeDefined()
+    })
+  })
+})
