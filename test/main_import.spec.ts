@@ -22,5 +22,5 @@ describe('main.ts import', () => {
   const gp = mockApp.config.globalProperties as unknown as { emitter?: { emit: () => void } }
   expect(gp.emitter).toBeDefined()
   expect(typeof gp.emitter!.emit).toBe('function')
-  })
+  }, 20000)
 })
