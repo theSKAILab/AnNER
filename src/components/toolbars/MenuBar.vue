@@ -336,6 +336,11 @@ export default {
     },
     reloadWindow() {
       window.onbeforeunload = null // Disable the beforeunload event
+      // Call wrapper so tests can spy on this method instead of the read-only
+      // window.location.reload which is environment-dependent.
+      this.performReload()
+    },
+    performReload() {
       window.location.reload()
     },
     save() {

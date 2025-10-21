@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import Token from './Token'
+import Token from './Token.vue'
 import { mapState } from 'vuex'
 
 export default {

@@ -17,6 +17,12 @@ const mutations = {
    * @returns {void}
    */
   loadFile(state: State, file: File): void {
+    // Clear all current store data before processing (new) file
+    state.annotationManager = null
+    state.labelManager = null
+    state.tokenManager = null
+    state.versionControlManager = new VersionControlManager()
+    state.tokenManagers = []
     state.fileName = file.name
     const fileType = file.name.split('.').pop()
     const reader = new FileReader()

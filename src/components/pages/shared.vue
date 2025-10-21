@@ -1,7 +1,7 @@
 <script lang="ts">
 import { mapMutations, mapState } from 'vuex'
-import Token from '../blocks/Token'
-import TokenBlock from '../blocks/TokenBlock'
+import Token from '../blocks/Token.vue'
+import TokenBlock from '../blocks/TokenBlock.vue'
 import LabelsBlock from '../blocks/LabelsBlock.vue'
 import AggregateBlock from '../blocks/AggregateBlock.vue'
 import InfoBar from '../toolbars/InfoBar.vue'

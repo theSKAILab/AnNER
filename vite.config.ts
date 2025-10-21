@@ -32,6 +32,22 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  test: {
+    environment: 'jsdom',
+    include: ['**/*.spec.ts'],
+    coverage: {
+      // you can include other reporters, but 'json-summary' is required, json is recommended
+      reporter: ['text', 'json-summary', 'json'],
+      // If you want a coverage reports even if your tests are failing, include the reportOnFailure option
+      reportOnFailure: true,
+      thresholds: {
+      lines: 95,
+      branches: 95,
+      functions: 50,
+      statements: 95
+      }
+    },
+  },
   base: '/AnNER/',
   define: {
     "__APP_VERSION__": JSON.stringify(process.env.npm_package_version),
