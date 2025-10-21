@@ -46,7 +46,7 @@ describe('App drag and drop handlers', () => {
 // from: test\App.spec.ts
 (() => {
 
-// (App.spec.ts original block) Note: quasar mock is declared above so setup() picks it up
+// (reused top-level quasar mock) - do not redeclare notifyMock or re-mock 'quasar' here
 describe('App.vue drag/drop behavior', () => {
   it('toggles overlayActive on drag enter/leave and handles drop', async () => {
     const loadFile = vi.fn()
