@@ -7,10 +7,6 @@
           :token="t"
           :class="[t.reviewed ? 'user-active' : 'user-inactive']" />
 
-        <aggregate-block v-else-if="t instanceof TMTokenAggregate"
-          :tokenBlocks="t.tokenBlocks"
-          @remove-block="onRemoveBlock" />
-
         <token-block v-else-if="t instanceof TMTokenBlock"
           :token="t"
           :class="[t.reviewed ? 'user-active' : 'user-inactive']"
