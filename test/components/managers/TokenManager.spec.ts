@@ -2,7 +2,7 @@
 // Consolidated tests for source: components\managers\TokenManager
 
 import { expect, test } from 'vitest'
-import { TokenManager, TMToken, TMTokenBlock, TMTokenAggregate } from '/src/components/managers/TokenManager'
+import { TokenManager, TMToken, TMTokenBlock } from '/src/components/managers/TokenManager'
 import { LabelManager } from '/src/components/managers/LabelManager'
 import { Paragraph, Entity } from '/src/components/managers/AnnotationManager'
 import { expect, test, vi } from 'vitest'
@@ -146,18 +146,7 @@ describe('TokenManager remaining branches', () => {
 (() => {
 
 describe('TokenManager additional behaviors', () => {
-  it('addNewBlock handles overlapping blocks and removeDuplicateBlocks', () => {
-    const lm = new LabelManager()
-    const tm = new TokenManager(lm, [[0,1,'a'], [2,3,'b'], [4,5,'c']])
-    // create initial block covering 2..3
-    tm.addNewBlock(2,3, lm.currentLabel, 'Candidate')
-    expect(tm.tokenBlocks.length).toBeGreaterThan(0)
-    // add another block that overlaps existing block and tokens
-    tm.addNewBlock(1,4, lm.currentLabel, 'Accepted')
-    // Ensure tokens array stays sorted and duplicates removed
-    tm.removeDuplicateBlocks()
-    expect(tm.tokens.length).toBeGreaterThan(0)
-  })
+  // Test removed - references deleted removeDuplicateBlocks method
 
   it('getBlockByStart returns null for missing block and restoreOriginalBlockState is safe', () => {
     const lm = new LabelManager()
@@ -237,19 +226,7 @@ describe('TokenManager edge cases', () => {
     expect(tm.getBlockByStart(0)).toBeNull()
   })
 
-  it('removeDuplicateBlocks deduplicates token blocks', () => {
-    const lm = new LabelManager()
-    lm.addLabel('C')
-    const tokens = [[0,1,'a'], [1,2,'b']] as any
-    const tm = new TokenManager(lm, tokens)
-    tm.addNewBlock(0,2, lm.getLabelByName('C'), 'Candidate', [])
-    // artificially duplicate
-    const blk = tm.getBlockByStart(0)
-    if (blk) tm.tokens.push(blk)
-    const before = tm.tokens.length
-    tm.removeDuplicateBlocks()
-    expect(tm.tokens.length).toBeLessThan(before)
-  })
+  // Test removed - references deleted removeDuplicateBlocks method
 
   it('restoreOriginalBlockState is safe when block exists', () => {
     const lm = new LabelManager()
@@ -281,19 +258,7 @@ describe('TokenManager advanced branches', () => {
     expect(tm.getBlockByStart(block.start)).not.toBeNull()
   })
 
-  it('removeDuplicateBlocks deduplicates tokens', () => {
-    const lm = new LabelManager()
-    const tm = new TokenManager(lm, [[0,1,'a'], [1,2,'b']])
-    // add duplicate blocks by reference
-    const b = new TMTokenBlock(0, 2, [new TMToken(0,1,'a','Candidate')], lm.currentLabel as any, 'Candidate')
-    tm.tokens.push(b)
-    tm.tokens.push(b)
-    tm.removeDuplicateBlocks()
-  // tokens should be deduplicated (edited should increment)
-  const before = tm.edited
-  tm.removeDuplicateBlocks()
-  expect(tm.edited).toBeGreaterThanOrEqual(before + 1)
-  })
+  // Test removed - references deleted removeDuplicateBlocks method
 
   it('addNewBlock manualState path toggles manual behavior', () => {
     const lm = new LabelManager()

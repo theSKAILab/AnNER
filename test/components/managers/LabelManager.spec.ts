@@ -621,15 +621,7 @@ test('TokenManager addNewBlock handles targetedBlocks empty and manualState true
   expect(tm.tokenBlocks.length).toBeGreaterThanOrEqual(1)
 })
 
-test('TokenManager removeBlock does nothing when block missing and removeDuplicateBlocks safe', () => {
-  const lm = new LabelManager()
-  const tm = new TokenManager(lm, Tokenizer.span_tokenize('x y'))
-  const before = tm.tokens.length
-  tm.removeBlock(9999, true)
-  expect(tm.tokens.length).toBe(before)
-  tm.removeDuplicateBlocks()
-  expect(tm.tokens.length).toBeGreaterThanOrEqual(0)
-})
+// Test removed - references deleted removeDuplicateBlocks method
 
 test('AnnotationPage and ReviewPage created hook tokenize path and beforeLeave returns string', () => {
   const am = new AnnotationManager([[null, 't', { entities: [] }]])
@@ -879,8 +871,7 @@ describe('Managers full coverage', () => {
     // add overlapping block that should reintroduce tokens and mark overlapped as Rejected
     tm.addNewBlock(1,3, lm.currentLabel, 'Accepted')
     expect(tm.tokenBlocks.length).toBeGreaterThan(0)
-    // remove duplicate blocks no-op
-    tm.removeDuplicateBlocks()
+    // removeDuplicateBlocks method was deleted
     // getBlockByStart and restoreOriginalBlockState
     const b = tm.getBlockByStart(0)
     if (b) {

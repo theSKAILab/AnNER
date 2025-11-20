@@ -9,7 +9,7 @@ import MenuBar from '/src/components/toolbars/MenuBar.vue'
 import { LabelManager } from '/src/components/managers/LabelManager'
 import { AnnotationManager } from '/src/components/managers/AnnotationManager'
 import { describe, it, expect, vi } from 'vitest'
-import AggregateBlock from '/src/components/blocks/AggregateBlock.vue'
+
 import TokenBlock from '/src/components/blocks/TokenBlock.vue'
 import { TMToken, TMTokenBlock } from '/src/components/managers/TokenManager'
 import { store } from '/src/components/managers/Store'
@@ -150,8 +150,7 @@ describe('Pages coverage - AnnotationPage & ReviewPage', () => {
     // allow rendering pipeline
     await wrapper.vm.$nextTick()
 
-    // should render an AggregateBlock for overlapping blocks and a TokenBlock for the non-overlapping one
-    expect(wrapper.findComponent(AggregateBlock).exists()).toBe(true)
+    // AggregateBlock component was deleted, only checking TokenBlock
     expect(wrapper.findComponent(TokenBlock).exists()).toBe(true)
   })
 
@@ -175,7 +174,7 @@ describe('Pages coverage - AnnotationPage & ReviewPage', () => {
 
     await wrapper.vm.$nextTick()
 
-    expect(wrapper.findComponent(AggregateBlock).exists()).toBe(true)
+    // AggregateBlock component was deleted, only checking TokenBlock
     expect(wrapper.findComponent(TokenBlock).exists()).toBe(true)
   })
 
