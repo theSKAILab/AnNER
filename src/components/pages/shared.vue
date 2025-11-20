@@ -41,23 +41,56 @@ export default {
     },
     eligibleTokens() {
       const renderList: TMTokens[] = [];
+      const processedBlocks = new Set(); // Track processed block IDs
+      
       for (let i = 0; i < this.tokenManager.tokens.length; i++) {
         const t = this.tokenManager.tokens[i];
         if (t instanceof TMToken) {
           renderList.push(t);
         } else if (t instanceof TMTokenBlock) {
-          // Check if overlapping with any other blocks
+          // Skip if this block has already been processed
+          if (processedBlocks.has(t.start)) {
+            continue;
+          }
+          
+          // Check for overlapping blocks
           const overlapping = this.tokenManager.isOverlapping(t.start, t.end);
+          
           if (overlapping && overlapping.length > 1) {
-            // If overlapping, check to ensure if entire overlap range is already in the list
-            // If not, add the entire list returned by isOverlapping to the renderList
-            const overlapAggregate = new TMTokenAggregate(overlapping);
-            if (!renderList.find(r => r instanceof TMTokenAggregate && r.start === overlapAggregate.start && r.end === overlapAggregate.end)) {
-              renderList.push(overlapAggregate);
+            // For overlapping blocks, only show the latest suggested/accepted annotation
+            // Hide rejected blocks that overlap with non-rejected blocks
+            const activeBlocks = overlapping.filter(block => 
+              block.currentState === 'Suggested' || 
+              block.currentState === 'Candidate' || 
+              block.currentState === 'Accepted'
+            );
+            
+            if (activeBlocks.length > 0) {
+              // Find the most recent active block based on history or state
+              const mostRecentActive = activeBlocks.reduce((latest, current) => {
+                // Prioritize 'Suggested' over 'Candidate', and by history length
+                if (current.currentState === 'Suggested' && latest.currentState !== 'Suggested') {
+                  return current;
+                } else if (latest.currentState === 'Suggested' && current.currentState !== 'Suggested') {
+                  return latest;
+                } else {
+                  // Both same state, compare by history length or position
+                  return (current.history?.length || 0) >= (latest.history?.length || 0) ? current : latest;
+                }
+              });
+              
+              renderList.push(mostRecentActive);
+            } else {
+              // If all blocks are rejected, still show one of them (standalone rejected blocks)
+              renderList.push(overlapping[0]);
             }
+            
+            // Mark all overlapping blocks as processed
+            overlapping.forEach(block => processedBlocks.add(block.start));
           } else {
-            // If not overlapping, add the block itself
+            // Non-overlapping block - show it regardless of state
             renderList.push(t);
+            processedBlocks.add(t.start);
           }
         }
       }
@@ -132,25 +165,38 @@ export default {
       // Determine if the selection will overlap with an existing block and add to undo stack accordingly
       const existingBlocks = this.tokenManager.isOverlapping(start, end)
       if (existingBlocks) {
-        // Prompt to user to confirm overlapping blocks
-        this.$q
-          .dialog({
-            title: 'Overlapping Annotations',
-            message:
-              'Your selection overlaps with existing annotations. Continuing will apply your current selection to the existing block. Do you want to proceed?',
-            cancel: true,
-            persistent: true,
-          })
-          .onOk(() => {
-            this.versionControlManager.addUndo(this.tokenManager)
-            this.tokenManager.addNewBlock(
-              start,
-              end,
-              this.labelManager.currentLabel,
-              'Suggested',
-              [],
-            )
-          })
+        // When overlapping in review mode, reject the existing blocks and create a new suggested one
+        // In annotation mode, prompt for confirmation
+        if (this.currentPage === 'review') {
+          this.versionControlManager.addUndo(this.tokenManager)
+          this.tokenManager.addNewBlock(
+            start,
+            end,
+            this.labelManager.currentLabel,
+            'Suggested',
+            [],
+          )
+        } else {
+          // Prompt to user to confirm overlapping blocks in annotation mode
+          this.$q
+            .dialog({
+              title: 'Overlapping Annotations',
+              message:
+                'Your selection overlaps with existing annotations. Continuing will create a new annotation while preserving the existing ones. Do you want to proceed?',
+              cancel: true,
+              persistent: true,
+            })
+            .onOk(() => {
+              this.versionControlManager.addUndo(this.tokenManager)
+              this.tokenManager.addNewBlock(
+                start,
+                end,
+                this.labelManager.currentLabel,
+                'Suggested',
+                [],
+              )
+            })
+        }
       } else {
         this.versionControlManager.addUndo(this.tokenManager)
         this.tokenManager.addNewBlock(
@@ -164,7 +210,31 @@ export default {
 
       selection?.empty()
     },
-    // Callbacks for Token and TokenBlock components
+    /**
+     * Determines if a token block should be visible in the UI
+     * Rejected blocks that overlap with suggested blocks should be hidden
+     * @param {TMTokenBlock} block - The token block to check
+     * @returns {boolean} - Whether the block should be displayed
+     */
+    isBlockVisibleInUI(block) {
+      // Always show non-rejected blocks
+      if (block.currentState !== 'Rejected') {
+        return true;
+      }
+      
+      // For rejected blocks, check if they overlap with any suggested blocks
+      const overlapping = this.tokenManager.isOverlapping(block.start, block.end);
+      if (overlapping && overlapping.length > 1) {
+        // If there's a suggested block in the same range, hide this rejected one
+        const hasSuggestedOverlap = overlapping.some(b => 
+          b !== block && (b.currentState === 'Suggested' || b.currentState === 'Candidate' || b.currentState === 'Accepted')
+        );
+        return !hasSuggestedOverlap;
+      }
+      
+      // Show standalone rejected blocks
+      return true;
+    },
     /**
      * Removes TokenBlock from the TokenManager
      * @param {Number} blockStart - The start position of the block to remove
