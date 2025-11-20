@@ -3,9 +3,8 @@ import { mapMutations, mapState } from 'vuex'
 import Token from '../blocks/Token.vue'
 import TokenBlock from '../blocks/TokenBlock.vue'
 import LabelsBlock from '../blocks/LabelsBlock.vue'
-import AggregateBlock from '../blocks/AggregateBlock.vue'
 import InfoBar from '../toolbars/InfoBar.vue'
-import { TMToken, TMTokenAggregate, TMTokenBlock } from '../managers/TokenManager'
+import { TMToken, TMTokenBlock, type TMTokens } from '../managers/TokenManager'
 
 export default {
   name: 'SharedEditorFunctions',
@@ -13,13 +12,11 @@ export default {
     Token,
     TokenBlock,
     LabelsBlock,
-    InfoBar,
-    AggregateBlock
+    InfoBar
   },
   data() {
     return {
       TMToken,
-      TMTokenAggregate,
       TMTokenBlock
     }
   },

@@ -57,21 +57,6 @@ export class TMToken implements TMTokens {
   }
 }
 
-export class TMTokenAggregate implements TMTokens {
-  public tokenBlocks: TMTokenBlock[]
-  public start: number
-  public end: number
-  public type: string = 'token-aggregate' // Default type for token aggregates
-  public currentState: string | undefined
-
-  constructor(tokenBlocks: TMTokenBlock[]) {
-    this.tokenBlocks = tokenBlocks
-    this.start = tokenBlocks[0].start
-    this.end = tokenBlocks[tokenBlocks.length - 1].end
-    this.currentState = undefined
-  }
-}
-
 /**
  * Class representing a block of tokens in the TokenManager.
  * @description This class implements the TMTokens interface and represents a block of tokens with its start, end, label class, current state, and history.
@@ -360,16 +345,6 @@ export class TokenManager {
       this.edited++
       this.tokens.sort((a, b) => a.start - b.start)
     }
-  }
-
-  /**
-   * Removes duplicate blocks from the tokens array.
-   * @description This method removes duplicate blocks from the tokens array, ensuring that each block is unique.
-   * @returns {void}
-   */
-  public removeDuplicateBlocks(): void {
-    this.tokens = [...new Set(this.tokens.sort((a, b) => a.start - b.start))]
-    this.edited++
   }
 
   /**
