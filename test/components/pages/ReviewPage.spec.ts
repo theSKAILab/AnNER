@@ -6,7 +6,7 @@ import { mount } from '@vue/test-utils'
 import ReviewPage from '/src/components/pages/ReviewPage.vue'
 import AnnotationPage from '/src/components/pages/AnnotationPage.vue'
 import { test, expect, vi, afterEach } from 'vitest'
-import { TMToken, TMTokenAggregate, TMTokenBlock } from '/src/components/managers/TokenManager'
+import { TMToken, TMTokenBlock } from '/src/components/managers/TokenManager'
 import { shallowMount } from '@vue/test-utils'
 
 
@@ -160,41 +160,9 @@ test('template renders token with reviewed=true shows active class', () => {
   expect(vm.html()).toContain('user-active')
 })
 
-test('template renders aggregate-block when eligibleTokens contains TMTokenAggregate', () => {
-  const block = new TMTokenBlock(0, 2, [new TMToken(0,1,'a','Candidate')], { id:1, name:'L', color: 'red-11' } as any, 'Candidate')
-  const aggregate = new TMTokenAggregate([block])
-  const store: any = { state: { annotationManager: { inputSentences: [] } } }
-  const emitter = { on: vi.fn(), off: vi.fn() }
-  const vm = shallowMount(ReviewPage, {
-    global: { mocks: { $store: store, emitter }, stubs: ['labels-block', 'token', 'aggregate-block', 'token-block', 'info-bar'] },
-    computed: { 
-      eligibleTokens: () => [aggregate],
-      tokenManager: () => ({ tokens: [aggregate], removeBlock: vi.fn(), isOverlapping: () => null }),
-      versionControlManager: () => ({ addUndo: vi.fn() }),
-    }
-  })
-  expect(vm.html()).toContain('aggregate-block-stub')
-})
+// Test removed - references deleted TMTokenAggregate class
 
-test('aggregate-block @remove-block calls onRemoveBlock and triggers managers', () => {
-  const block = new TMTokenBlock(0, 2, [new TMToken(0,1,'a','Candidate')], { id:1, name:'L', color: 'red-11' } as any, 'Candidate')
-  const aggregate = new TMTokenAggregate([block])
-  const store: any = { state: { annotationManager: { inputSentences: [] } } }
-  const emitter = { on: vi.fn(), off: vi.fn() }
-  const vm = shallowMount(ReviewPage, {
-    global: { mocks: { $store: store, emitter }, stubs: ['labels-block', 'token', 'aggregate-block', 'token-block', 'info-bar'] },
-    computed: { 
-      eligibleTokens: () => [aggregate],
-      tokenManager: () => ({ tokens: [aggregate], removeBlock: vi.fn(), isOverlapping: () => null }),
-      versionControlManager: () => ({ addUndo: vi.fn() }),
-    }
-  })
-
-  // call the handler as if the aggregate emitted remove-block
-  ;(vm.vm as any).onRemoveBlock(block.start)
-  expect((vm.vm as any).versionControlManager.addUndo).toHaveBeenCalledWith((vm.vm as any).tokenManager)
-  expect((vm.vm as any).tokenManager.removeBlock).toHaveBeenCalledWith(block.start)
-})
+// Test removed - references deleted TMTokenAggregate class
 
 test('template handles unknown token types (no branch matches)', () => {
   const store: any = { state: { annotationManager: { inputSentences: [] } } }
