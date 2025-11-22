@@ -232,39 +232,25 @@ export class TokenManager {
 
     const overlappedBlocks: TMTokens[] | null = this.isOverlapping(selectionStart, selectionEnd)
 
-    // If there are overlapping blocks, mark them as rejected and collect their tokens
-    // for inclusion in the new suggested annotation
+    // If there are overlapping blocks, temporarily remove them, reintroduce their tokens, add the new block, then reinsert the other blocks
     if (overlappedBlocks) {
       overlappedBlocks.sort((a, b) => a.start - b.start)
 
-      // Step 1: Mark overlapping blocks as rejected and remove them from tokens array
+      // if (overlappedBlocks[0] instanceof TMTokenBlock) history = overlappedBlocks[0].history
+
+      // Step 1: Remove overlapping blocks and reintroduce their tokens
       for (const block of overlappedBlocks) {
-        if (!manualState) {
-          block.currentState = 'Rejected' // Set overlapped blocks to Rejected
-          if (block instanceof TMTokenBlock) {
-            block.reviewed = true // Mark as reviewed to preserve in export
-          }
-        }
-        // Remove the overlapped block from tokens array temporarily
+        if (!manualState) block.currentState = 'Rejected' // Set overlapped blocks to Rejected
         this.tokens = this.tokens.filter((token: TMTokens) => {
           return token.start != block.start
         })
-        // Reintroduce individual tokens from the overlapped block
-        if (block instanceof TMTokenBlock) {
-          this.tokens.push(...block.tokens)
-        }
+        this.tokens.push(...(block as TMTokenBlock).tokens)
         this.tokens.sort((a, b) => a.start - b.start)
       }
     }
 
     const targetedBlocks: TMTokens[] = this.blocksInRange(selectionStart, selectionEnd)
 
-    // Remove old blocks in prep for new blocks
-    for (let i = 0; i < targetedBlocks.length; i++) {
-      this.tokens = this.tokens.filter((token: TMTokens) => {
-        return token.start != targetedBlocks[i].start
-      })
-    }
 
     // Go ahead and insert the new block now
     // If we overlapped, the overwrites of the blocks params will be passed in
@@ -280,14 +266,7 @@ export class TokenManager {
       ),
     )
 
-    // Reinsert original overlapped blocks if any (now marked as Rejected)
-    if (overlappedBlocks) {
-      for (const block of overlappedBlocks) {
-        if (block instanceof TMTokenBlock) {
-          this.tokens.push(block)
-        }
-      }
-    }
+    // Do not reinsert overlapped blocks; their non-selected tokens remain as plain tokens
 
     this.tokens.sort((a, b) => a.start - b.start)
 
