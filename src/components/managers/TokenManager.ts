@@ -266,20 +266,27 @@ export class TokenManager {
       ),
     )
 
-    // Do not reinsert overlapped blocks; their non-selected tokens remain as plain tokens
+    // Reinsert original overlapped blocks as rejected
+    if (overlappedBlocks) {
+      for (const block of overlappedBlocks) {
+        if (block instanceof TMTokenBlock) {
+          this.tokens.push(block)
+        }
+      }
+    }
 
     this.tokens.sort((a, b) => a.start - b.start)
 
     // Remove individual tokens that are covered by any token block
-    const tokenBlocks = this.tokens.filter(token => token instanceof TMTokenBlock) as TMTokenBlock[]
+    const tokenBlocks = this.tokens.filter(
+      token => token instanceof TMTokenBlock && token.currentState !== 'Rejected',
+    ) as TMTokenBlock[]
     this.tokens = this.tokens.filter(token => {
       if (token instanceof TMTokenBlock) {
         return true // Keep all token blocks
       }
       // Remove individual tokens that are covered by any token block
-      return !tokenBlocks.some(block => 
-        token.start >= block.start && token.end <= block.end
-      )
+      return !tokenBlocks.some(block => token.start >= block.start && token.end <= block.end)
     })
   }
 
