@@ -44,6 +44,7 @@
           hint="Enter a NER Tag and click [+] to add it"
           dense
           autofocus
+          input-style="text-transform: uppercase;"
         >
           <template v-slot:append>
             <q-btn round dense flat color="primary" icon="fa fa-plus" @click="saveLabel" />
