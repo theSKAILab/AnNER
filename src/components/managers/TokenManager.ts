@@ -279,7 +279,7 @@ export class TokenManager {
 
     // Remove individual tokens that are covered by any token block
     const tokenBlocks = this.tokens.filter(
-      token => token instanceof TMTokenBlock && token.currentState !== 'Rejected',
+      token => token instanceof TMTokenBlock,
     ) as TMTokenBlock[]
     this.tokens = this.tokens.filter(token => {
       if (token instanceof TMTokenBlock) {

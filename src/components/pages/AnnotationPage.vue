@@ -3,14 +3,10 @@
     <labels-block />
     <div class="q-pa-lg" style="height: calc(100vh - 190px); overflow-y: scroll">
       <template v-for="t in eligibleTokens" :key="`${t.type}-${t.start}`">
-        <token v-if="t instanceof TMToken" 
-          :token="t"
-          :class="[t.reviewed ? 'user-active' : 'user-inactive']" />
+        <token v-if="t instanceof TMToken" :token="t" :class="[t.reviewed ? 'user-active' : 'user-inactive']" />
 
-        <token-block v-else-if="t instanceof TMTokenBlock"
-          :token="t"
-          :class="[t.reviewed ? 'user-active' : 'user-inactive']"
-          @remove-block="onRemoveBlock" />
+        <token-block v-else-if="t instanceof TMTokenBlock" :token="t"
+          :class="[t.reviewed ? 'user-active' : 'user-inactive']" @remove-block="onRemoveBlock" />
       </template>
     </div>
     <info-bar />
