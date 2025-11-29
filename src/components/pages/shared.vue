@@ -78,8 +78,12 @@ export default {
               
               renderList.push(mostRecentActive);
             } else {
-              // If all blocks are rejected, still show one of them (standalone rejected blocks)
-              renderList.push(overlapping[0]);
+              // If all blocks are rejected, still show one of them
+              // The one to be shown should be the latest block (by history length, smallest number of entries)
+              const latestRejected = overlapping.reduce((latest, current) => {
+                return (current.history?.length || 0) <= (latest.history?.length || 0) ? current : latest;
+              });
+              renderList.push(latestRejected);
             }
             
             // Mark all overlapping blocks as processed
