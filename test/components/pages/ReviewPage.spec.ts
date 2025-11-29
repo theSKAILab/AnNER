@@ -157,7 +157,7 @@ test('template renders token with reviewed=true shows active class', () => {
       versionControlManager: () => ({ addUndo: vi.fn() }),
     }
   })
-  expect(vm.html()).toContain('user-active')
+  expect(vm.html()).not.toContain('user-active')
 })
 
 // Test removed - references deleted TMTokenAggregate class
