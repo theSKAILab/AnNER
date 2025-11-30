@@ -236,21 +236,32 @@ export class TokenManager {
     if (overlappedBlocks) {
       overlappedBlocks.sort((a, b) => a.start - b.start)
 
-      // if (overlappedBlocks[0] instanceof TMTokenBlock) history = overlappedBlocks[0].history
-
       // Step 1: Remove overlapping blocks and reintroduce their tokens
       for (const block of overlappedBlocks) {
         if (!manualState) block.currentState = 'Rejected' // Set overlapped blocks to Rejected
         this.tokens = this.tokens.filter((token: TMTokens) => {
           return token.start != block.start
         })
-        this.tokens.push(...(block as TMTokenBlock).tokens)
+        // Only add tokens that don't already exist and do not exist in any other token block
+        const tokensToAdd = (block as TMTokenBlock).tokens.filter(token => 
+          !this.tokens.some(existingToken => 
+            existingToken.start === token.start && existingToken.end === token.end
+          ) &&
+          !this.tokenBlocks.some(tokenBlock => 
+            tokenBlock.tokens.some(blockToken => 
+              blockToken.start === token.start && blockToken.end === token.end
+            )
+          )
+        )
+        this.tokens.push(...tokensToAdd)
         this.tokens.sort((a, b) => a.start - b.start)
       }
     }
 
-    const targetedBlocks: TMTokens[] = this.blocksInRange(selectionStart, selectionEnd)
+    // Ensure all tokens are unique before proceeding
+    this.tokens = Array.from(new Set(this.tokens))
 
+    const targetedBlocks: TMTokens[] = this.blocksInRange(selectionStart, selectionEnd)
 
     // Go ahead and insert the new block now
     // If we overlapped, the overwrites of the blocks params will be passed in
@@ -281,12 +292,13 @@ export class TokenManager {
     const tokenBlocks = this.tokens.filter(
       token => token instanceof TMTokenBlock,
     ) as TMTokenBlock[]
+  
     this.tokens = this.tokens.filter(token => {
       if (token instanceof TMTokenBlock) {
         return true // Keep all token blocks
       }
       // Remove individual tokens that are covered by any token block
-      return !tokenBlocks.some(block => token.start >= block.start && token.end <= block.end)
+      return !tokenBlocks.some(block => token.start >= block.start && token.end <= block.end && block.currentState !== 'Rejected')
     })
   }
 
