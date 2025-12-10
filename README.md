@@ -7,7 +7,7 @@ downstream tasks.
 This tool was designed and developed in the Spatial Knowledge and Artificial Intelligence (SKAI) lab at University of Maine. This research was supported in part by the U.S. Department of Agriculture through a National Institute of Food and Agriculture (NIFA) grant, Award #2021-67022-34366
 
 Cite this tool as:
-> Umayer Reza, Nicholas Pease, Torsten Hahmann, and Jinwu Wang. (2025). Annotation and Named Entity Review Tool (AnNER) [Computer software].
+> Umayer Reza, Nicholas Pease, Jinwu Wang, and Torsten Hahmann. 2025. AnNER: Supporting Efficient Entity Annotation and Review Workflows for Knowledge Graph Construction. In Proceedings of the 13th Knowledge Capture Conference 2025 (K-CAP '25). Association for Computing Machinery, New York, NY, USA, 52–55. https://doi.org/10.1145/3731443.3771347
 
 ## Local Development
 To get started with local development, clone the repository and install all required dependencies with
