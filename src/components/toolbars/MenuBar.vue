@@ -347,7 +347,7 @@ export default {
       this.$q
         .dialog({
           title: 'Save File',
-          message: 'Please enter a name for the exported annotations file',
+          message: 'Please enter your name as you would like it to appear in the file',
           prompt: {
             model: '',
             type: 'text',
