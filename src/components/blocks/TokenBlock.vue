@@ -1,6 +1,9 @@
 <template>
   <mark
-    :class="['bg-' + this.token.labelClass.color, { 'shadow-unreviewed': !this.token.reviewed }]"
+    :class="[
+      this.token.currentState === 'Rejected'? 'bg-grey-5' : 'bg-' + this.token.labelClass.color, 
+      { 'shadow-unreviewed': !this.token.reviewed }
+    ]"
     style="margin-left: 5px; margin-right: 5px"
   >
     <Token v-for="t in token.tokens" :key="t.start" :token="t" />
