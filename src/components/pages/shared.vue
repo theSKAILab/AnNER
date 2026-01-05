@@ -75,8 +75,11 @@ export default {
                   return (current.history?.length || 0) >= (latest.history?.length || 0) ? current : latest;
                 }
               });
-              
-              renderList.push(mostRecentActive);
+
+              // Ensure the most recent active block has not already been added
+              if (!processedBlocks.has(mostRecentActive.start)) {
+                renderList.push(mostRecentActive);
+              }
             } else {
               // If all blocks are rejected, still show one of them
               // The one to be shown should be the latest block (by history length, smallest number of entries)
