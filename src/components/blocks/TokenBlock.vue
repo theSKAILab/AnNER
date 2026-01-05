@@ -40,9 +40,12 @@
         round
         flat
         size="xs"
-        text-color="grey-9"
-        title="Dark indicates that you have reviewed this annotation, light means you have not."
+        :text-color="this.token.reviewed ? 'green' : 'amber-8'"
+        :title="this.token.reviewed ? 'Reviewed - Click to mark as not reviewed' : 'Not reviewed - Click to mark as reviewed'"
         @click.stop="toggleReviewed"
+        :style="{ 
+          backgroundColor: this.token.reviewed ? '#e8f5e8' : '#fff8dc'
+        }"
       />
     </span>
   </mark>
