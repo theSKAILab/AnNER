@@ -297,8 +297,8 @@ export class TokenManager {
       if (token instanceof TMTokenBlock) {
         return true // Keep all token blocks
       }
-      // Remove individual tokens that are covered by any token block
-      return !tokenBlocks.some(block => token.start >= block.start && token.end <= block.end && block.currentState !== 'Rejected')
+      // Remove individual tokens that overlap any token block (even partially)
+      return !tokenBlocks.some(block => token.start < block.end && token.end > block.start)
     })
   }
 
