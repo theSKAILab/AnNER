@@ -130,6 +130,8 @@ mark {
   /* Thicker border for emphasis */
   border-radius: 0.5rem;
   /* Larger border-radius */
+  white-space: nowrap;
+  /* Prevent line breaks within annotation blocks */
 }
 
 .tag {
