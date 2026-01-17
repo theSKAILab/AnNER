@@ -142,14 +142,81 @@ export default {
         return
       }
 
-      const rangeStart = selection?.getRangeAt(0)
-      const rangeEnd = selection?.getRangeAt(selection?.rangeCount - 1)
+      if (!selection?.rangeCount) {
+        return
+      }
+
+      const range = selection.getRangeAt(0)
+
+      const resolveTokenEl = (node: Node | null) => {
+        if (!node) return null
+
+        // Prefer a direct Element, otherwise fall back to its parent
+        const el =
+          node instanceof Element
+            ? node
+            : (node as unknown as { parentElement?: HTMLElement }).parentElement
+
+        if (!el) return null
+        if (typeof (el as HTMLElement).closest === 'function') {
+          return (el as HTMLElement).closest('[id^="t"]') as HTMLElement | null
+        }
+
+        // For test doubles or non-Element parents without closest
+        return (el as HTMLElement).id?.startsWith?.('t') ? (el as HTMLElement) : null
+      }
+
+      const findTokenByStart = (tokenStart: number): TMToken | null => {
+        if (!this.tokenManager?.tokens) {
+          return null
+        }
+
+        for (const token of this.tokenManager.tokens) {
+          if (token instanceof TMToken && token.start === tokenStart) {
+            return token
+          }
+          if (token instanceof TMTokenBlock) {
+            const nested = token.tokens.find((t) => t.start === tokenStart)
+            if (nested) {
+              return nested
+            }
+          }
+        }
+
+        return null
+      }
+
+      const startEl = resolveTokenEl(range.startContainer)
+      const endEl = resolveTokenEl(range.endContainer)
 
       let start, end
       try {
-        start = parseInt(rangeStart.startContainer.parentElement.id.replace('t', ''))
-        const offsetEnd = parseInt(rangeEnd.endContainer.parentElement.id.replace('t', ''))
-        end = offsetEnd + rangeEnd.endOffset
+        const startIdx = startEl ? parseInt(startEl.id.replace('t', '')) : NaN
+        const endIdx = endEl ? parseInt(endEl.id.replace('t', '')) : NaN
+
+        if (Number.isNaN(startIdx) || Number.isNaN(endIdx)) {
+          return
+        }
+
+        const startToken = findTokenByStart(startIdx)
+        const endToken = findTokenByStart(endIdx)
+        const startTokenLength = startToken ? startToken.end - startToken.start : 0
+        const endTokenLength =
+          endToken?.end && endToken?.start !== undefined
+            ? endToken.end - endToken.start
+            : endEl?.textContent?.length ?? 0
+
+        const rangeStartOffset =
+          range.startContainer && (range.startContainer as any).nodeType === Node.TEXT_NODE
+            ? Math.min(range.startOffset, startTokenLength || range.startOffset)
+            : 0
+        const rangeEndOffset =
+          range.endContainer && (range.endContainer as any).nodeType === Node.TEXT_NODE
+            ? Math.min(range.endOffset, endTokenLength || range.endOffset)
+            : endTokenLength
+
+        start = startIdx + rangeStartOffset
+        end = endIdx + rangeEndOffset
       } catch {
         return
       }
