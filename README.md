@@ -1,6 +1,8 @@
 ## AnNER: A Tool for Named Entity Annotation and Review Workflows
 ![](https://img.shields.io/github/package-json/version/theSKAILab/AnNER?style=for-the-badge&logo=vuedotjs) [![Docs](https://img.shields.io/badge/Documentation-gray?style=for-the-badge)](https://theskailab.github.io/AnNER/docs/) ![](https://img.shields.io/github/deployments/theSKAILab/AnNER/github-pages?style=for-the-badge&logo=htmx&label=Deployment)
 
+> **Note:** We currently recommend using the repository at [https://github.com/umayerr/AnNER](https://github.com/umayerr/AnNER) for the latest stable and actively maintained version of AnNER. Changes in this repository will be merged into the original `https://github.com/theskailab/AnNER` repository after an additional round of bug fixes and testing.
+
 AnNER is a web-based tool for annotating text with named entities that, beyond basic annotation functionalities, offers a review mode that allows multiple users to review existing annotations and propose corrections or additions. The tool keeps track of the annotation history and exports a semantic representation of the annotation provenance to increase their trustworthiness, which is critical for large-scale knowledge graph construction and other
 downstream tasks.
 
